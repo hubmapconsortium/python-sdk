@@ -41,3 +41,5 @@ class dataset(entity):
         self.thumbnail_file = thumbnail_file
         self.thumbnail_file_to_add = thumbnail_file_to_add
         self.thumbnail_file_to_remove = thumbnail_file_to_remove
+    def get_creators(self):
+        return self.creators
