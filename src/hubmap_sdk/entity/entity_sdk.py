@@ -5,10 +5,12 @@ from collection import collection
 from dataset import dataset
 import requests
 
+
 class entity_api:
     def __init__(self, token=None, location=None):
         self.token = token
         self.location = location
+        self.header = {'Authorization': 'Bearer ' + self.token}
         if self.location.lower() == "prod" or self.location is None:
             self.entity_url = "entity-api.hubmapconsortium.org/"
         if self.location.lower == "test":
@@ -23,11 +25,19 @@ class entity_api:
             raise Exception("Argument 'location' if included must be case-insensitive: 'LOCALHOST', 'DEV', 'TEST', "
                             "'STAGE', or 'PROD'. If not included, it will be assumed as 'PROD'")
 
+    # Using an instance of entity-api class with appropriate authentication token, location ('TEST', 'PROD', 'DEV', etc)
+    # as well as the entity_type ('donor', 'sample', etc) and a dictionary containing the data for the new entity, an
+    # entity will be created via the entity-api. If the entity is created successfully, a new instance of the class
+    # corresponding to the desired entity will be returned. If creation fails, an exception will be raised with the
+    # error message from entity-api.
     def create_entity(self, entity_type, data):
         header = {'Authorization': 'Bearer ' + self.token}
         if entity_type.lower() not in ['donor, sample, dataset, upload, collection']:
             raise Exception("Accepted entity types are (case-insensitive):" +
                             " 'donor', 'sample', 'dataset', 'upload', or 'collection'")
+        if self.token is None:
+            raise Exception("The entity-api instance used does not have a token attribute. A valid token is required"
+                            "to create an entity")
         url = self.entity_url + 'entities/' + entity_type
         try:
             r = requests.post(url, headers=header, json=data)
@@ -45,7 +55,7 @@ class entity_api:
                                   last_modified_user_sub=output['last_modified_user_sub'],
                                   last_modified_user_email=output['last_modified_user_email'],
                                   last_modified_user_displayname=output['last_modified_user_displayname'],
-                                  entity_type= output['entity_type'], registered_doi=output['registered_doi'],
+                                  entity_type=output['entity_type'], registered_doi=output['registered_doi'],
                                   doi_url=output['doi_url'], creators=output['creators'], contacts=output['contacts'],
                                   description=output['description'], data_access_level=output['data_access_level'],
                                   image_files=output['image_files'], image_files_to_add=output['image_files_to_add'],
@@ -148,4 +158,48 @@ class entity_api:
         else:
             err = r.json['error']
             raise Exception(err)
+
+    # returns "Hello! This is HuBMAP Entity API service :)". It is a convenient way to verify that the desired server
+    # is operational without requiring any particular authorization
+    def index(self):
+        try:
+            r = requests.get(self.entity_url)
+        except Exception as e:
+            raise Exception(e)
+        return r
+
+    # returns the version, build, and neo4j_connection status and prints the same information out.
+    def get_status(self):
+        try:
+            r = requests.get(self.entity_url + 'status')
+        except Exception as e:
+            print(e)
+            return e
+        output = r.json()
+        if r.status_code < 400:
+            print('version: ' + output['version'] + ', build: ' + output['build'] + ', neo4j_connecton:'
+                  + output['neo4j_connection'])
+        return output
+
+    def get_ancestor_organs(self, identification):
+        if self.token is None:
+            try:
+                r = requests.get(self.entity_url + 'entities/' + identification + '/ancestor-organs')
+            except Exception as e:
+                raise Exception(e)
+        else:
+            try:
+                r = requests.get(self.entity_url + 'entities/' + identification + '/ancestor-organs', headers=self.header)
+            except Exception as e:
+                raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+
+
+
+
 
