@@ -44,116 +44,21 @@ class entity_api:
         except Exception as e:
             raise Exception(e)
         if r.status_code < 400:
-            output = r.json
+            output = r.json()
             if entity_type.lower == "donor":
-                new_donor = donor(created_timestamp=output['created_timestamp'],
-                                  created_by_user_displayname=output['created_by_user_displayname'],
-                                  created_by_user_email=output['created_by_user_email'],
-                                  created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
-                                  hubmap_id=output['hubmap_id'],
-                                  last_modified_user_timestamp=output['last_modified_user_timestamp'],
-                                  last_modified_user_sub=output['last_modified_user_sub'],
-                                  last_modified_user_email=output['last_modified_user_email'],
-                                  last_modified_user_displayname=output['last_modified_user_displayname'],
-                                  entity_type=output['entity_type'], registered_doi=output['registered_doi'],
-                                  doi_url=output['doi_url'], creators=output['creators'], contacts=output['contacts'],
-                                  description=output['description'], data_access_level=output['data_access_level'],
-                                  image_files=output['image_files'], image_files_to_add=output['image_files_to_add'],
-                                  image_files_to_remove=output['image_files_to_remove'],
-                                  protocol_url=output['protocol'], metadata=output['metadata'],
-                                  submission_id=output['submission_id'], lab_donor_id=output['lab_donor_id'],
-                                  group_uuid=output['group_uuid'], group_name=output['group_name'],
-                                  label=output['label'])
+                new_donor = entity_api.create_donor(output)
                 return new_donor
             if entity_type.lower() == "dataset":
-                new_dataset = dataset(created_timestamp=output['created_timestamp'],
-                                      created_by_user_displayname=output['created_by_user_displayname'],
-                                      created_by_user_email=output['created_by_user_email'],
-                                      created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
-                                      hubmap_id=['hubmap_id'],
-                                      last_modified_user_timestamp=output['last_modified_user_timestamp'],
-                                      last_modified_user_email=output['last_modified_user_email'],
-                                      last_modified_user_sub=output['last_modified_user_sub'],
-                                      last_modified_user_displayname=output['last_modified_user_displayname'],
-                                      entity_type=output['entity_type'], registered_doi=output['registered_doi'],
-                                      doi_url=output['doi_url'], creators=output['creators'],
-                                      contacts=output['contact'], antibodies=output['antibodies'],
-                                      description=output['description'], data_access_level=output['data_access_level'],
-                                      contains_human_genetic_sequences=output['contains_human_genetic_sequences'],
-                                      status=output['status'], title=output['title'], data_types=output['data_types'],
-                                      upload=output['upload'], collections=output['collections'],
-                                      contributors=output['contributors'], direct_ancestors=output['direct_ancestors'],
-                                      published_timestamp=output['published_timestamp'],
-                                      published_user_displayname=output['published_user_displayname'],
-                                      published_user_sub=output['published_user_sub'],
-                                      published_user_email=output['published_user_email'],
-                                      ingest_metadata=output['ingest_metadata'],
-                                      local_directory_rel_path=output['local_directory_rel_path'],
-                                      group_uuid=output['group_uuid'], group_name=output['group_name'],
-                                      previous_revision_uuid=output['previous_revision_uuid'],
-                                      next_revision_uuid=output['next_revision_uuid'],
-                                      thumbnail_file=output['thumbnail_file'],
-                                      thumbnail_file_to_add=output['thumbnail_file_to_add'],
-                                      thumbnail_file_to_remove=output['thumbnail_file_to_remove'])
+                new_dataset = entity_api.create_dataset(output)
                 return new_dataset
             if entity_type.lower() == 'sample':
-                new_sample = sample(created_timestamp=output['created_timestamp'],
-                                    created_by_user_displayname=output['created_by_user_displayname'],
-                                    created_by_user_email=output['created_by_user_email'],
-                                    created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
-                                    hubmap_id=output['hubmap_id'],
-                                    last_modified_user_displayname=output['last_modified_user_displayname'],
-                                    entity_type=output['entity_type'],
-                                    registered_doi=output['registered_doi'], doi_url=output['doi_url'],
-                                    creators=output['creators'], contacts=output['contacts'],
-                                    description=output['description'], data_access_level=output['data_access_level'],
-                                    specimen_type=output['specimen_type'],
-                                    specimen_type_other=output['specimen_type_other'],
-                                    protocol_url=output['protocol_url'], group_uuid=output['group_uuid'],
-                                    group_name=output['group_name'], organ=output['organ'],
-                                    organ_other=output['organ_other'],
-                                    direct_ancestor_uuid=output['direct_ancestor_uuid'],
-                                    submission_id=output['submission_id'],
-                                    lab_tissue_sample_id=output['lab_tissue_sample_id'],
-                                    rui_location=output['rui_location'], metadata=output['metadata'],
-                                    visit=output['visit'], image_files=output['image_files'],
-                                    image_files_to_add=output['image_files_to_add'],
-                                    metadata_files=output['metadata_files'],
-                                    metadata_files_to_add=output['metadata_files_to_add'],
-                                    metadata_files_to_remove=output['metadata_files_to_remove'])
+                new_sample = entity_api.create_sample(output)
                 return new_sample
             if entity_type.lower() == 'upload':
-                new_upload = upload(created_timestamp=output['created_timestamp'],
-                                    created_by_user_displayname=output['created_by_user_displayname'],
-                                    created_by_user_email=output['created_by_user_email'],
-                                    created_by_user_sub=output['created_by_user_sub'],uuid=output['uuid'],
-                                    hubmap_id=output['hubmap_id'],
-                                    last_modified_user_timestamp=output['last_modified_user_timestamp'],
-                                    last_modified_user_sub=output['last_modified_user_sub'],
-                                    last_modified_user_email=output['last_modified_user_email'],
-                                    last_modified_user_displayname=output['last_modified_user_displayname'],
-                                    entity_type=output['entity_type'], description=output['description'],
-                                    title=output['title'], status=output['status'],
-                                    validation_message=output['validation_message'], group_uuid=output['group_uuid'],
-                                    group_name=output['group_name'],
-                                    dataset_uuids_to_link=output['dataset_uuids_to_link'],
-                                    dataset_uuids_to_unlink=output['dataset_uuids_to_unlink'],
-                                    datasets=output['datasets'])
+                new_upload = entity_api.create_upload(output)
                 return new_upload
             if entity_type.lower() == 'collection':
-                new_collection = collection(created_timestamp=output['created_timestamp'],
-                                            created_by_user_displayname=output['created_by_user_displayname'],
-                                            created_by_user_email=output['created_by_user_email'],
-                                            created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
-                                            hubmap_id=output['hubmap_id'],
-                                            last_modified_user_timestamp=output['last_modified_user_timestamp'],
-                                            last_modified_user_sub=output['last_modified_user_sub'],
-                                            last_modified_user_email=output['last_modified_user_email'],
-                                            last_modified_user_displayname=output['last_modified_user_displayname'],
-                                            datasets=output['datasets'], entity_type=output['entity_type'],
-                                            registered_doi=output['registered_doi'], doi_url=output['doi_url'],
-                                            creators=output['creators'], contacts=output['contacts'],
-                                            title=output['title'])
+                new_collection = entity_api.create_collection(output)
                 return new_collection
         else:
             err = r.json['error']
@@ -197,6 +102,298 @@ class entity_api:
             raise Exception(err)
         else:
             return r.json()
+
+    # takes the id of an entity (HuBMAP ID or UUID) and returns a
+    def get_entity_by_id(self, identification, query_filter=None):
+        if self.token is None:
+            if query_filter is None:
+                try:
+                    r = requests.get(self.entity_url + "entities/" + identification)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "entities/" + identification + "?property=" + query_filter)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if query_filter is None:
+                try:
+                    r = requests.get(self.entity_url + "entities/" + identification, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "entities/" + identification + "?property=" + query_filter,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    # Takes in an id (HuBMAP ID or UUID) and returns a dictionary with the provenance tree above the given ID.
+    # Optionally accepts an integer "depth" which will limit the size of the returned tree.
+    def get_entity_provenance(self, identification, depth=None):
+        if self.token is None:
+            if depth is None:
+                try:
+                    r = requests.get(self.entity_url + "entities/" + identification + "/provenance")
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "entities/" +
+                                     identification + "/provenance" + "?depth=" + depth)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if depth is None:
+                try:
+                    r = requests.get(self.entity_url + "entities/" + identification +
+                                     "/provenance", headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "entities/" + identification + "/provenance" + "?depth=" +
+                                     depth, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_entity_types(self):
+        if self.token is None:
+            try:
+                r = requests.get(self.entity_url + "entity-types/")
+            except Exception as e:
+                raise Exception(e)
+        else:
+            try:
+                r = requests.get(self.entity_url + "entity-types/", headers=self.header)
+            except Exception as e:
+                raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_entities_by_type(self, entity_type, property_key=None):
+        if self.token is None:
+            raise Exception("A token is required for get_entities_by_type. The instance of entity-api calling "
+                            "get_entities_by_type has a token value of None")
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + entity_type + "/entities", headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + entity_type + "/entities?property=" + property_key,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_collection(self,identification):
+        if self.token is None:
+            try:
+                r = requests.get(self.entity_url + "collections/" + identification)
+            except Exception as e:
+                raise Exception(e)
+        else:
+            try:
+                r = requests.get(self.entity_url + "collections/" + identification, headers=self.header)
+            except Exception as e:
+                raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_collections(self, property_key=None):
+        if self.token is None:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + "collections")
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "collections" + property_key)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + "collections", headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "collections" + property_key, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def create_multiple_samples(self, count, data):
+        result = []
+        try:
+            r = requests.post(self.entity_url + "entities/multiple-samples/" + count, headers=self.header, json=data)
+        except Exception as e:
+            raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            sample_list = r.json()
+            for output in sample_list:
+                sample_instance = entity_api.create_sample(output)
+                result.append(sample_instance)
+        return result
+
+    @staticmethod
+    def create_sample(output):
+        new_sample = sample(created_timestamp=output['created_timestamp'],
+                            created_by_user_displayname=output['created_by_user_displayname'],
+                            created_by_user_email=output['created_by_user_email'],
+                            created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
+                            hubmap_id=output['hubmap_id'],
+                            last_modified_user_timestamp=output['last_modified_user_timestamp'],
+                            last_modified_user_sub=output['last_modified_user_sub'],
+                            last_modified_user_email=output['last_modified_user_email'],
+                            last_modified_user_displayname=output['last_modified_user_displayname'],
+                            entity_type=output['entity_type'],
+                            registered_doi=output['registered_doi'], doi_url=output['doi_url'],
+                            creators=output['creators'], contacts=output['contacts'],
+                            description=output['description'], data_access_level=output['data_access_level'],
+                            specimen_type=output['specimen_type'],
+                            specimen_type_other=output['specimen_type_other'],
+                            protocol_url=output['protocol_url'], group_uuid=output['group_uuid'],
+                            group_name=output['group_name'], organ=output['organ'],
+                            organ_other=output['organ_other'],
+                            direct_ancestor_uuid=output['direct_ancestor_uuid'],
+                            submission_id=output['submission_id'],
+                            lab_tissue_sample_id=output['lab_tissue_sample_id'],
+                            rui_location=output['rui_location'], metadata=output['metadata'],
+                            visit=output['visit'], image_files=output['image_files'],
+                            image_files_to_remove=output['image_files_to_remove'],
+                            image_files_to_add=output['image_files_to_add'],
+                            metadata_files=output['metadata_files'],
+                            metadata_files_to_add=output['metadata_files_to_add'],
+                            metadata_files_to_remove=output['metadata_files_to_remove'])
+        return new_sample
+
+    @staticmethod
+    def create_donor(output):
+        new_donor = donor(created_timestamp=output['created_timestamp'],
+                          created_by_user_displayname=output['created_by_user_displayname'],
+                          created_by_user_email=output['created_by_user_email'],
+                          created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
+                          hubmap_id=output['hubmap_id'],
+                          last_modified_user_timestamp=output['last_modified_user_timestamp'],
+                          last_modified_user_sub=output['last_modified_user_sub'],
+                          last_modified_user_email=output['last_modified_user_email'],
+                          last_modified_user_displayname=output['last_modified_user_displayname'],
+                          entity_type=output['entity_type'], registered_doi=output['registered_doi'],
+                          doi_url=output['doi_url'], creators=output['creators'], contacts=output['contacts'],
+                          description=output['description'], data_access_level=output['data_access_level'],
+                          image_files=output['image_files'], image_files_to_add=output['image_files_to_add'],
+                          image_files_to_remove=output['image_files_to_remove'],
+                          protocol_url=output['protocol'], metadata=output['metadata'],
+                          submission_id=output['submission_id'], lab_donor_id=output['lab_donor_id'],
+                          group_uuid=output['group_uuid'], group_name=output['group_name'],
+                          label=output['label'])
+        return new_donor
+
+    @staticmethod
+    def create_dataset(output):
+        new_dataset = dataset(created_timestamp=output['created_timestamp'],
+                              created_by_user_displayname=output['created_by_user_displayname'],
+                              created_by_user_email=output['created_by_user_email'],
+                              created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
+                              hubmap_id=['hubmap_id'],
+                              last_modified_user_timestamp=output['last_modified_user_timestamp'],
+                              last_modified_user_email=output['last_modified_user_email'],
+                              last_modified_user_sub=output['last_modified_user_sub'],
+                              last_modified_user_displayname=output['last_modified_user_displayname'],
+                              entity_type=output['entity_type'], registered_doi=output['registered_doi'],
+                              doi_url=output['doi_url'], creators=output['creators'],
+                              contacts=output['contact'], antibodies=output['antibodies'],
+                              description=output['description'], data_access_level=output['data_access_level'],
+                              contains_human_genetic_sequences=output['contains_human_genetic_sequences'],
+                              status=output['status'], title=output['title'], data_types=output['data_types'],
+                              upload=output['upload'], collections=output['collections'],
+                              contributors=output['contributors'], direct_ancestors=output['direct_ancestors'],
+                              published_timestamp=output['published_timestamp'],
+                              published_user_displayname=output['published_user_displayname'],
+                              published_user_sub=output['published_user_sub'],
+                              published_user_email=output['published_user_email'],
+                              ingest_metadata=output['ingest_metadata'],
+                              local_directory_rel_path=output['local_directory_rel_path'],
+                              group_uuid=output['group_uuid'], group_name=output['group_name'],
+                              previous_revision_uuid=output['previous_revision_uuid'],
+                              next_revision_uuid=output['next_revision_uuid'],
+                              thumbnail_file=output['thumbnail_file'],
+                              thumbnail_file_to_add=output['thumbnail_file_to_add'],
+                              thumbnail_file_to_remove=output['thumbnail_file_to_remove'])
+        return new_dataset
+
+    @staticmethod
+    def create_upload(output):
+        new_upload = upload(created_timestamp=output['created_timestamp'],
+                            created_by_user_displayname=output['created_by_user_displayname'],
+                            created_by_user_email=output['created_by_user_email'],
+                            created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
+                            hubmap_id=output['hubmap_id'],
+                            last_modified_user_timestamp=output['last_modified_user_timestamp'],
+                            last_modified_user_sub=output['last_modified_user_sub'],
+                            last_modified_user_email=output['last_modified_user_email'],
+                            last_modified_user_displayname=output['last_modified_user_displayname'],
+                            entity_type=output['entity_type'], description=output['description'],
+                            title=output['title'], status=output['status'],
+                            validation_message=output['validation_message'], group_uuid=output['group_uuid'],
+                            group_name=output['group_name'],
+                            dataset_uuids_to_link=output['dataset_uuids_to_link'],
+                            dataset_uuids_to_unlink=output['dataset_uuids_to_unlink'],
+                            datasets=output['datasets'])
+        return new_upload
+
+    @staticmethod
+    def create_collection(output):
+        new_collection = collection(created_timestamp=output['created_timestamp'],
+                                    created_by_user_displayname=output['created_by_user_displayname'],
+                                    created_by_user_email=output['created_by_user_email'],
+                                    created_by_user_sub=output['created_by_user_sub'], uuid=output['uuid'],
+                                    hubmap_id=output['hubmap_id'],
+                                    last_modified_user_timestamp=output['last_modified_user_timestamp'],
+                                    last_modified_user_sub=output['last_modified_user_sub'],
+                                    last_modified_user_email=output['last_modified_user_email'],
+                                    last_modified_user_displayname=output['last_modified_user_displayname'],
+                                    datasets=output['datasets'], entity_type=output['entity_type'],
+                                    registered_doi=output['registered_doi'], doi_url=output['doi_url'],
+                                    creators=output['creators'], contacts=output['contacts'],
+                                    title=output['title'])
+        return new_collection
+
 
 
 
