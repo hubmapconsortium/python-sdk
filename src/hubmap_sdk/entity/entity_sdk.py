@@ -18,7 +18,7 @@ class entity_api:
         if self.location.lower() == "dev":
             self.entity_url = "entity-api.dev.hubmapconsortium.org/"
         if self.location.lower() == "stage":
-            self.entity._url = "entity-api.stage.hubmapconsortium.org/"
+            self.entity_url = "entity-api.stage.hubmapconsortium.org/"
         if self.location.lower() == "localhost":
             self.entity_url = "localhost:8383"
         else:
@@ -61,7 +61,7 @@ class entity_api:
                 new_collection = entity_api.create_collection(output)
                 return new_collection
         else:
-            err = r.json['error']
+            err = r.json()['error']
             raise Exception(err)
 
     # returns "Hello! This is HuBMAP Entity API service :)". It is a convenient way to verify that the desired server
@@ -94,7 +94,8 @@ class entity_api:
                 raise Exception(e)
         else:
             try:
-                r = requests.get(self.entity_url + 'entities/' + identification + '/ancestor-organs', headers=self.header)
+                r = requests.get(self.entity_url + 'entities/' + identification + '/ancestor-organs',
+                                 headers=self.header)
             except Exception as e:
                 raise Exception(e)
         if r.status_code > 399:
@@ -207,7 +208,7 @@ class entity_api:
         else:
             return r.json()
 
-    def get_collection(self,identification):
+    def get_collection(self, identification):
         if self.token is None:
             try:
                 r = requests.get(self.entity_url + "collections/" + identification)
@@ -269,6 +270,114 @@ class entity_api:
                 sample_instance = entity_api.create_sample(output)
                 result.append(sample_instance)
         return result
+
+    def update_entity(self, identification, data):
+        try:
+            r = requests.put(self.entity_url + 'entities/' + identification, headers=self.header, json=data)
+        except Exception as e:
+            raise Exception(e)
+        output = r.json()
+        if output['entity_type'].lower() == 'dataset':
+            new_instance = entity_api.create_dataset(output)
+        if output['entity_type'].lower() == 'donor':
+            new_instance = entity_api.create_donor(output)
+        if output['entity_type'].lower() == 'sample':
+            new_instance = entity_api.create_sample(output)
+        if output['entity_type'].lower() == 'collection':
+            new_instance = entity_api.create_collection(output)
+        if output['entity_type'].lower() == 'upload':
+            new_instance = entity_api.create_upload(output)
+        return new_instance
+
+    def get_ancestors(self, identification, property_key):
+        if self.token is None:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + "ancestors/" + identification)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "ancestors/" + identification + "?property=" + property_key)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + "ancestors/" + identification, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "ancestors/" + identification + "?property=" + property_key,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_descendants(self, identification, property_key):
+        if self.token is None:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + "descendants/" + identification)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "descendants/" + identification + "?property=" + property_key)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + "descendants/" + identification, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + "descendants/" + identification + "?property=" + property_key,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_parents(self, identification, property_key):
+        if self.token is None:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'parents/' + identification)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'parents/' + identification + '?property=' + property_key)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'parents/' + identification, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'parents/' + identification + '?property=' + property_key,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
 
     @staticmethod
     def create_sample(output):
@@ -393,10 +502,3 @@ class entity_api:
                                     creators=output['creators'], contacts=output['contacts'],
                                     title=output['title'])
         return new_collection
-
-
-
-
-
-
-
