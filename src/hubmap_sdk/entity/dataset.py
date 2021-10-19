@@ -1,4 +1,4 @@
-import entity
+from src.hubmap_sdk.entity.entity import entity
 
 
 class dataset(entity):

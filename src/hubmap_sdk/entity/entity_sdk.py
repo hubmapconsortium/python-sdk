@@ -1,9 +1,17 @@
-from donor import donor
-from sample import sample
-from upload import upload
-from collection import collection
-from dataset import dataset
+from src.hubmap_sdk.entity.donor import donor
+from src.hubmap_sdk.entity.upload import upload
+from src.hubmap_sdk.entity.dataset import dataset
+from src.hubmap_sdk.entity.collection import collection
+from src.hubmap_sdk.entity.sample import sample
 import requests
+
+"""
+The entity-api class is the mechanism by which functions of the entity api are interacted with. 
+Create an instance of the class, and give it the optional arguments 'token' and 'location'. Token is a globus
+nexus authentication token, and location is the development environment you will be using ('LOCALHOST', 'DEV', 'TEST', 
+'STAGE', or 'PROD'). If no token is given, only functionality designated for public access will be usable. If no
+location is given, all requests will be made against the production servers
+"""
 
 
 class entity_api:
@@ -11,15 +19,15 @@ class entity_api:
         self.token = token
         self.location = location
         self.header = {'Authorization': 'Bearer ' + self.token}
-        if self.location.lower() == "prod" or self.location is None:
-            self.entity_url = "entity-api.hubmapconsortium.org/"
-        if self.location.lower == "test":
-            self.entity_url = "entity-api.test.hubmapconsortium.org/"
-        if self.location.lower() == "dev":
-            self.entity_url = "entity-api.dev.hubmapconsortium.org/"
-        if self.location.lower() == "stage":
-            self.entity_url = "entity-api.stage.hubmapconsortium.org/"
-        if self.location.lower() == "localhost":
+        # if self.location.lower() == "prod" or self.location is None:
+        #     self.entity_url = "https://entity-api.hubmapconsortium.org/"
+        if self.location.lower() == "test":
+            self.entity_url = "https://entity-api.test.hubmapconsortium.org/"
+        elif self.location.lower() == "dev":
+            self.entity_url = "https://entity-api.dev.hubmapconsortium.org/"
+        elif self.location.lower() == "stage":
+            self.entity_url = "https://entity-api.stage.hubmapconsortium.org/"
+        elif self.location.lower() == "localhost":
             self.entity_url = "localhost:8383"
         else:
             raise Exception("Argument 'location' if included must be case-insensitive: 'LOCALHOST', 'DEV', 'TEST', "
@@ -28,22 +36,36 @@ class entity_api:
     # Using an instance of entity-api class with appropriate authentication token, location ('TEST', 'PROD', 'DEV', etc)
     # as well as the entity_type ('donor', 'sample', etc) and a dictionary containing the data for the new entity, an
     # entity will be created via the entity-api. If the entity is created successfully, a new instance of the class
-    # corresponding to the desired entity will be returned. If creation fails, an exception will be raised with the
+    # corresponding to the desired entity_type will be returned. If creation fails, an exception will be raised with the
     # error message from entity-api.
     def create_entity(self, entity_type, data):
-        header = {'Authorization': 'Bearer ' + self.token}
-        if entity_type.lower() not in ['donor, sample, dataset, upload, collection']:
-            raise Exception("Accepted entity types are (case-insensitive):" +
-                            " 'donor', 'sample', 'dataset', 'upload', or 'collection'")
+        # The create entity action requires a valid token
         if self.token is None:
             raise Exception("The entity-api instance used does not have a token attribute. A valid token is required"
                             "to create an entity")
-        url = self.entity_url + 'entities/' + entity_type
+
+        # The token used to create the header is obtained from the entity-api instance calling this method
+        header = {'Authorization': 'Bearer ' + self.token}
+
+        # If an entity_type given is not one of the accepted entity types, an exception will be raised.
+        if entity_type.lower() not in ['donor, sample, dataset, upload, collection']:
+            raise Exception("Accepted entity types are (case-insensitive):" +
+                            " 'donor', 'sample', 'dataset', 'upload', or 'collection'")
+
+        # If the request to entity-api fails, an exception will be raised.
         try:
-            r = requests.post(url, headers=header, json=data)
+            r = requests.post(self.entity_url + 'entities/' + entity_type, headers=header, json=data)
         except Exception as e:
             raise Exception(e)
-        if r.status_code < 400:
+
+        # If the request to entity-api is successfully made, however a 400-599 response code is returned, an exception
+        # Is raised
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+
+        # Upon a satisfactory response from entity-api, a new instance of the desired class will be created and returned
+        else:
             output = r.json()
             if entity_type.lower == "donor":
                 new_donor = entity_api.create_donor(output)
@@ -60,9 +82,6 @@ class entity_api:
             if entity_type.lower() == 'collection':
                 new_collection = entity_api.create_collection(output)
                 return new_collection
-        else:
-            err = r.json()['error']
-            raise Exception(err)
 
     # returns "Hello! This is HuBMAP Entity API service :)". It is a convenient way to verify that the desired server
     # is operational without requiring any particular authorization
@@ -86,6 +105,9 @@ class entity_api:
                   + output['neo4j_connection'])
         return output
 
+    # Takes an id for a sample or dataset and will return a list of organs that are ancestors to the given sample or
+    # Dataset. This method does not require authorization, however if a token is given, it must be valid, and if no
+    # token is given, ancestor organ info will only be returned for public entities.
     def get_ancestor_organs(self, identification):
         if self.token is None:
             try:
@@ -104,7 +126,7 @@ class entity_api:
         else:
             return r.json()
 
-    # takes the id of an entity (HuBMAP ID or UUID) and returns a
+    # takes the id of an entity (HuBMAP ID or UUID) and returns an instance of the entity corresponding to the ID given
     def get_entity_by_id(self, identification, query_filter=None):
         if self.token is None:
             if query_filter is None:
@@ -133,7 +155,18 @@ class entity_api:
             err = r.json()['error']
             raise Exception(err)
         else:
-            return r.json()
+            entity_type = r.json()['entity_type']
+            if entity_type.lower() == 'dataset':
+                output = entity_api.create_dataset(r.json())
+            if entity_type.lower() == 'sample':
+                output = entity_api.create_sample(r.json())
+            if entity_type.lower() == 'donor':
+                output = entity_api.create_donor(r.json())
+            if entity_type.lower() == 'upload':
+                output = entity_api.create_upload(r.json())
+            if entity_type.lower() == 'collection':
+                output = entity_api.create_collection(r.json())
+            return output
 
     # Takes in an id (HuBMAP ID or UUID) and returns a dictionary with the provenance tree above the given ID.
     # Optionally accepts an integer "depth" which will limit the size of the returned tree.
@@ -169,6 +202,8 @@ class entity_api:
         else:
             return r.json()
 
+    # returns a list of all available entity types as defined in the schema yaml
+    # https://raw.githubusercontent.com/hubmapconsortium/entity-api/test-release/entity-api-spec.yaml
     def get_entity_types(self):
         if self.token is None:
             try:
@@ -186,6 +221,11 @@ class entity_api:
         else:
             return r.json()
 
+    # Takes as input an entity type and returns a list of all entities within that given type. Optionally, rather than
+    # Returning all of the information about the entities, it is possible to filter such that only a certain property
+    # Is returned for each. This is given by the value "property_key". For example, you could retrieve a list of all
+    # donors, and chose to only have the uuid of each included in the list with
+    # entity-instance.get_entities_by_type('donor', property_key='uuid')
     def get_entities_by_type(self, entity_type, property_key=None):
         if self.token is None:
             raise Exception("A token is required for get_entities_by_type. The instance of entity-api calling "
@@ -375,6 +415,208 @@ class entity_api:
                     raise Exception(e)
         if r.status_code > 399:
             err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_children(self, identification, property_key):
+        if self.token is None:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'children/' + identification)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'children/' + identification + '?property=' + property_key)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'children/' + identification, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'children/' + identification + '?property=' + property_key,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_previous_revisions(self, identification, property_key):
+        if self.token is None:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'previous_revisions/' + identification)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'previous_revisions/' + identification + '?property=' +
+                                     property_key)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'previous_revisions/' + identification, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'previous_revisions/' + identification + '?property=' +
+                                     property_key,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_next_revisions(self, identification, property_key):
+        if self.token is None:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'next_revisions/' + identification)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'next_revisions/' + identification + '?property=' + property_key)
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if property_key is None:
+                try:
+                    r = requests.get(self.entity_url + 'next_revisions/' + identification, headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'next_revisions/' + identification + '?property=' + property_key,
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def add_datasets_to_collection(self, identification, list_of_datasets):
+        dataset_list = list_of_datasets
+        dataset_dictionary = {'dataset_uuids': dataset_list}
+        try:
+            r = requests.put(self.entity_url + 'collections/' + identification + '/add-datasets', headers=self.header,
+                             json=dataset_dictionary)
+        except Exception as e:
+            raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return "success"
+
+    def get_globus_url(self, identification):
+        if self.token is None:
+            try:
+                r = requests.get(self.entity_url + 'entities/' + identification + '/globus-url')
+            except Exception as e:
+                raise Exception(e)
+        else:
+            try:
+                r = requests.get(self.entity_url + 'entities/' + identification + 'globus-url', headers=self.header)
+            except Exception as e:
+                raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_dataset_latest_revision(self, identification):
+        if self.token is None:
+            try:
+                r = requests.get(self.entity_url + 'datasets/' + identification + '/latest-revision')
+            except Exception as e:
+                raise Exception(e)
+        else:
+            try:
+                r = requests.get(self.entity_url + 'datasets/' + identification + '/latest-revision',
+                                 headers=self.header)
+            except Exception as e:
+                raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()['error']
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def get_dataset_revision_number(self, identification):
+        if self.token is None:
+            try:
+                r = requests.get(self.entity_url + 'datasets/' + identification + '/revision')
+            except Exception as e:
+                raise Exception(e)
+        else:
+            try:
+                r = requests.get(self.entity_url + 'datasets/' + identification + '/revision', headers=self.header)
+            except Exception as e:
+                raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()
+            raise Exception(err)
+        else:
+            return r.json()
+
+    def retract_dataset(self, identification, retraction_reason):
+        retract_json = {'retraction_reason': retraction_reason}
+        try:
+            r = requests.get(self.entity_url + 'datasets/' + identification + '/retract', headers=self.header,
+                             json=retract_json)
+        except Exception as e:
+            raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()
+            raise Exception(err)
+        else:
+            new_dataset = entity_api.create_dataset(r.json())
+            return new_dataset
+
+    def get_revisions_list(self, identification, include_dataset=False):
+        if self.token is None:
+            if include_dataset is False:
+                try:
+                    r = requests.get(self.entity_url + 'datasets/' + identification + '/revisions')
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'datasets/' + identification + '/revisions?include_dataset=True')
+                except Exception as e:
+                    raise Exception(e)
+        else:
+            if include_dataset is False:
+                try:
+                    r = requests.get(self.entity_url + 'datasets/' + identification + '/revisions', headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+            else:
+                try:
+                    r = requests.get(self.entity_url + 'datasets/' + identification + '/revisions?include_dataset=True',
+                                     headers=self.header)
+                except Exception as e:
+                    raise Exception(e)
+        if r.status_code > 399:
+            err = r.json()
             raise Exception(err)
         else:
             return r.json()
