@@ -1,7 +1,8 @@
-from src.hubmap_sdk.entity.entity_sdk import entity_api
-from src.hubmap_sdk.entity.donor import donor
-from src.hubmap_sdk.entity.collection import collection
-from src.hubmap_sdk.entity.dataset import dataset
-from src.hubmap_sdk.entity.upload import upload
-from src.hubmap_sdk.entity.sample import sample
-from src.hubmap_sdk.entity.entity import entity
+from hubmap_sdk.sample import Sample
+from hubmap_sdk.donor import Donor
+from hubmap_sdk.upload import Upload
+from hubmap_sdk.collection import Collection
+from hubmap_sdk.dataset import Dataset
+from hubmap_sdk.entitysdk import EntitySdk
+from hubmap_sdk.entity import Entity
+import hubmap_sdk.sdk_helper

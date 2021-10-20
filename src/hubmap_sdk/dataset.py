@@ -1,7 +1,7 @@
-from src.hubmap_sdk.entity.entity import entity
+from hubmap_sdk.entity import Entity
 
 
-class dataset(entity):
+class Dataset(Entity):
     def __init__(self, created_timestamp, created_by_user_displayname, created_by_user_email, created_by_user_sub, uuid,
                  hubmap_id, last_modified_user_timestamp, last_modified_user_sub, last_modified_user_email,
                  last_modified_user_displayname, entity_type, registered_doi, doi_url, creators, contacts, antibodies,
