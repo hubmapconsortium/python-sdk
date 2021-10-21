@@ -1,11 +1,14 @@
 from hubmap_sdk import Sample, Donor, Upload, Collection, Dataset
 import requests
 
+
 def create_entity_instance():
     pass
 
 
-def make_request(method_type, instance, url, data=None, optional_argument=''):
+def make_request(method_type, instance, url, optional_argument=None, data=None):
+    if optional_argument is None:
+        optional_argument = ''
     if data is None:
         if instance.token is None:
             if method_type == 'get':

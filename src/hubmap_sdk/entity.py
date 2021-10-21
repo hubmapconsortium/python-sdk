@@ -1,27 +1,25 @@
 class Entity:
 
-    def __init__(self, created_timestamp, created_by_user_displayname, created_by_user_email, created_by_user_sub, uuid,
-                 hubmap_id, last_modified_user_timestamp, last_modified_user_sub, last_modified_user_email,
-                 last_modified_user_displayname, entity_type):
-        if created_timestamp is not None:
-            self.created_timestamp = created_timestamp
-        if created_by_user_displayname is not None:
-            self.created_by_user_displayname = created_by_user_displayname
-        if created_by_user_email is not None:
-            self.created_by_user_email = created_by_user_email
-        if created_by_user_sub is not None:
-            self.created_by_user_sub = created_by_user_sub
-        if uuid is not None:
-            self.uuid = uuid
-        if hubmap_id is not None:
-            self.hubmap_id = hubmap_id
-        if last_modified_user_timestamp is not None:
-            self.last_modified_user_timestamp = last_modified_user_timestamp
-        if last_modified_user_sub is not None:
-            self.last_modified_user_sub = last_modified_user_sub
-        if last_modified_user_displayname is not None:
-            self.last_modified_user_displayname = last_modified_user_displayname
-        if last_modified_user_email is not None:
-            self.last_modified_user_email = last_modified_user_email
-        if entity_type is not None:
-            self.entity_type = entity_type
+    def __init__(self, dictionary):
+        if dictionary['created_timestamp'] is not None:
+            self.created_timestamp = dictionary['created_timestamp']
+        if dictionary['created_by_user_displayname'] is not None:
+            self.created_by_user_displayname = dictionary['created_by_user_displayname']
+        if dictionary['created_by_user_email'] is not None:
+            self.created_by_user_email = dictionary['created_by_user_email']
+        if dictionary['created_by_user_sub'] is not None:
+            self.created_by_user_sub = dictionary['created_by_user_sub']
+        if dictionary['uuid'] is not None:
+            self.uuid = dictionary['uuid']
+        if dictionary['hubmap_id'] is not None:
+            self.hubmap_id = dictionary['hubmap_id']
+        if dictionary['last_modified_user_timestamp'] is not None:
+            self.last_modified_user_timestamp = dictionary['last_modified_user_timestamp']
+        if dictionary['last_modified_user_sub'] is not None:
+            self.last_modified_user_sub = dictionary['last_modified_user_sub']
+        if dictionary['last_modified_user_displayname'] is not None:
+            self.last_modified_user_displayname = dictionary['last_modified_user_displayname']
+        if dictionary['last_modified_user_email'] is not None:
+            self.last_modified_user_email = dictionary['last_modified_user_email']
+        if dictionary['entity_type'] is not None:
+            self.entity_type = dictionary['entity_type']
