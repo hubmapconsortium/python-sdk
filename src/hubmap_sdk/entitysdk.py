@@ -3,11 +3,14 @@ from hubmap_sdk import Donor, Sample, Collection, Upload, Dataset, sdk_helper
 import requests
 
 """
-The entity-api class is the mechanism by which functions of the entity api are interacted with. 
-Create an instance of the class, and give it the optional arguments 'token' and 'location'. Token is a globus
-nexus authentication token, and location is the development environment you will be using ('LOCALHOST', 'DEV', 'TEST', 
-'STAGE', or 'PROD'). If no token is given, only functionality designated for public access will be usable. If no
-location is given, all requests will be made against the production servers
+The entity-api class is the mechanism by which functions of the entity api are interacted. 
+Create an instance of the class and give it the optional arguments 'token' and 'service_url'. Token is a Globus
+nexus authentication token, and service_url is the base url to the entity webservice you would like to use. These are
+ "https://entity-apihubmapconsortium.org" for the production sever, "https://entity-api.dev.hubmapconsortium.org" for 
+ the DEV server, "https://entity-api.test.hubmapconsortium.org" for the TEST server, 
+ "https://entity-api.stage.hubmapconsortium.org" for the STAGE server or use a localhost. If no token is given, only 
+ functionality designated for public access will be usable. If no service_url is given, all requests will be made 
+ against the production server
 """
 
 
@@ -20,19 +23,16 @@ class EntitySdk:
             self.entity_url = service_url + '/'
         self.header = {'Authorization': 'Bearer ' + self.token}
 
-    # Using an instance of entity-api class with appropriate authentication token, location ('TEST', 'PROD', 'DEV', etc)
-    # as well as the entity_type ('donor', 'sample', etc) and a dictionary containing the data for the new entity, an
-    # entity will be created via the entity-api. If the entity is created successfully, a new instance of the class
-    # corresponding to the desired entity_type will be returned. If creation fails, an exception will be raised with the
-    # error message from entity-api.
+    # Using an instance of the EntitySdk class with appropriate authentication token, service_url as well as the
+    # entity_type ('donor', 'sample', etc) and a dictionary containing the data for the new entity, an entity will be
+    # created via the entity-api. If the entity is created successfully, a new instance of the class corresponding to
+    # the desired entity_type will be returned. If creation fails, an exception will be raised with the error message
+    # from entity-api.
     def create_entity(self, entity_type, data):
         # The create entity action requires a valid token
         if self.token is None:
             raise Exception("The entity-api instance used does not have a token attribute. A valid token is required"
                             "to create an entity")
-
-        # The token used to create the header is obtained from the entity-api instance calling this method
-        header = self.header
 
         # If an entity_type given is not one of the accepted entity types, an exception will be raised.
         if entity_type.lower() not in ['donor, sample, dataset, upload, collection']:
@@ -40,9 +40,9 @@ class EntitySdk:
                             " 'donor', 'sample', 'dataset', 'upload', or 'collection'")
 
         # If the request to entity-api fails, an exception will be raised.
-        r = requests.post(self.entity_url + 'entities/' + entity_type, headers=header, json=data)
+        r = requests.post(self.entity_url + 'entities/' + entity_type, headers=self.header, json=data)
 
-        # If the request to entity-api is successfully made, however a 400-599 response code is returned, an exception
+        # If the request to entity-api is successfully made, however a 300-599 response code is returned, an exception
         # Is raised
         if r.status_code > 299:
             err = r.json()['error']
@@ -50,40 +50,43 @@ class EntitySdk:
             raise Exception(error)
 
         # Upon a satisfactory response from entity-api, a new instance of the desired class will be created and returned
-        else:
-            output = r.json()
-            if entity_type.lower == "donor":
-                new_donor = EntitySdk.create_donor(output)
-                return new_donor
-            if entity_type.lower() == "dataset":
-                new_dataset = EntitySdk.create_dataset(output)
-                return new_dataset
-            if entity_type.lower() == 'sample':
-                new_sample = EntitySdk.create_sample(output)
-                return new_sample
-            if entity_type.lower() == 'upload':
-                new_upload = EntitySdk.create_upload(output)
-                return new_upload
-            if entity_type.lower() == 'collection':
-                new_collection = EntitySdk.create_collection(output)
-                return new_collection
+        output = r.json()
+        if entity_type.lower == "donor":
+            new_donor = Donor(output)
+            return new_donor
+        if entity_type.lower() == "dataset":
+            new_dataset = Dataset(output)
+            return new_dataset
+        if entity_type.lower() == 'sample':
+            new_sample = Sample(output)
+            return new_sample
+        if entity_type.lower() == 'upload':
+            new_upload = Upload(output)
+            return new_upload
+        if entity_type.lower() == 'collection':
+            new_collection = Collection(output)
+            return new_collection
 
     # returns the version, build, and neo4j_connection status and prints the same information out.
     def get_status(self):
         try:
             r = requests.get(self.entity_url + 'status')
+
+        # if the request fails, in this case an error is not raised. The error message is instead returned since this
+        # may be a desired outcome.
         except Exception as e:
             print(e)
             return e
         output = r.json()
-        if r.status_code < 299:
+        if r.status_code < 300:
             print('version: ' + output['version'] + ', build: ' + output['build'] + ', neo4j_connecton:'
                   + output['neo4j_connection'])
         return output
 
-    # Takes an id for a sample or dataset and will return a list of organs that are ancestors to the given sample or
-    # Dataset. This method does not require authorization, however if a token is given, it must be valid, and if no
-    # token is given, ancestor organ info will only be returned for public entities.
+    # Takes an id (HuBMAP id or UUID) for a sample or dataset and will return a list of organs that are ancestors to
+    # the given sample or Dataset. This method does not require authorization, however if a token is given, it must be
+    # valid, and if no token is given or if the token does not belong to HuBMAP-Read group, ancestor organ info will
+    # only be returned for public entities.
     def get_ancestor_organs(self, identification):
         url = f"{self.entity_url}entities/{identification}/ancestor-organs"
         return sdk_helper.make_request('get', self, url)
@@ -160,6 +163,7 @@ class EntitySdk:
 
     # returns a list of all available entity types as defined in the schema yaml
     # https://raw.githubusercontent.com/hubmapconsortium/entity-api/test-release/entity-api-spec.yaml
+    # A token is not required, but if one if given, it must be valid.
     def get_entity_types(self):
         url = f"{self.entity_url}entity-types/"
         r = sdk_helper.make_request('get', self, url)
@@ -175,12 +179,12 @@ class EntitySdk:
 
     # Takes as input an entity type and returns a list of all entities within that given type. Optionally, rather than
     # Returning all of the information about the entities, it is possible to filter such that only a certain property
-    # Is returned for each. This is given by the value "property_key". For example, you could retrieve a list of all
+    # is returned for each. This is given by the value "property_key". For example, you could retrieve a list of all
     # donors, and chose to only have the uuid of each included in the list with
-    # entity-instance.get_entities_by_type('donor', property_key='uuid')
+    # get_entities_by_type('donor', property_key='uuid')
     def get_entities_by_type(self, entity_type, property_key=None):
         url = f"{self.entity_url}{entity_type}/entities"
-        r = sdk_helper.make_request('get', self, url)
+        r = sdk_helper.make_request('get', self, url, property_key)
         # if 5 == 4:
         #     if self.token is None:
         #         raise Exception("A token is required for get_entities_by_type. The instance of entity-api calling "
@@ -244,7 +248,7 @@ class EntitySdk:
     def create_multiple_samples(self, count, data):
         result = []
         r = requests.post(self.entity_url + "entities/multiple-samples/" + count, headers=self.header, json=data)
-        if r.status_code > 399:
+        if r.status_code > 299:
             err = r.json()['error']
             raise Exception(err)
         else:
