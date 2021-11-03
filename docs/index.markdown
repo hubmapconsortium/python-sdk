@@ -4,11 +4,11 @@
 layout: home
 -->
 ![hubmap logo](hubmap-type-white250.png)
-#HuBMAP SDK
+# HuBMAP SDK
 
 ---
 
-###Table of contents
+### Table of contents
 1. [SDK Overview](#1-sdk-overview)
    1. [Getting Started](#11-getting-started)
    2. [Requirements](#12-requirements)
@@ -16,18 +16,18 @@ layout: home
 3. Search SDK
 
 ---
-###1. SDK Overview
+### 1. SDK Overview
 
 
 This document covers the HuBMAP SDK that provides an interface to the functions that can be accessed through the HuBMAP API's. These API's include Entity-Api, Search-Api, UUID-Api, and Ingest-API. Each API has its own client library contained within the hubmap_sdk package. Details for using the individual sdk's are provided in their respective section below.  
 
-####1.1 Getting Started
+#### 1.1 Getting Started
 The HuBMAP SDK takes the form of a python client library. This library (hubmap_sdk) can be installed via pip with the command
 ```bash
 pip install hubmap-sdk 
 ```
 
-####1.2 Requirements
+#### 1.2 Requirements
 hubmap_sdk has the following requirements:
 ```bash
 certifi==2021.10.8
@@ -40,8 +40,8 @@ urllib3==1.26.7
 
 
 ---
-###2. Entity SDK
-####2.1 Entity SDK Overview
+### 2. Entity SDK
+#### 2.1 Entity SDK Overview
 The entity sdk may be used to access any functionality from the Entity API. In order to use the entity sdk, you will 
 need to either import the hubmap_sdk package with 
 
@@ -108,11 +108,11 @@ hubmap_sdk creates these class instances to allow developers to have a workable 
 method "get_endpoint_by_id" is used (this endpoint is detailed below) and the id supplied is for a donor entity, rather
 than return a dictionary with the properties of that donor, an object of the class donor is returned.
 
-####2.2 Entity Sdk Methods 
+#### 2.2 Entity Sdk Methods 
 
 The following entity sdk methods each correspond with an endpoint inside the entity api. 
 
-#####Get Status
+##### Get Status
 <table>
 <tr><td>Description</td><td>Get status will print the current build, version, and neo4j connection status of the Entity Api.</td></tr>
 <tr><td>Arguments</td><td>None</td></tr>
@@ -135,7 +135,7 @@ Output:
 </table>
 
 
-#####Get Ancestor Organs 
+##### Get Ancestor Organs 
 <table>
 <tr><td>Description</td><td>Takes an id (HuBMAP id or UUID) for a sample or dataset and will return a list of organs that are ancestors to the given sample or Dataset.</td></tr>
 
@@ -164,7 +164,7 @@ The elements in the list are of the type <class 'hubmap_sdk.entitysdk.Sample'>
 <tr><td>Authorization</td><td>No token is required for this method. If a token is provided and it is invalid, an exception will be raised. If a token is not provided, or if a valid token is provided and the token is not part of the HuBMAP-Read group, only organs that are public will be returned.</td></tr>
 </table>
 
-#####Get Entity by ID
+##### Get Entity by ID
 <table>
 <tr><td>Description</td><td>Takes an id (HuBMAP id or UUID) for an entity and returns an instance of the class corresponding to the given id.</td></tr>
 <tr><td>Arguments</td><td><table><tr><td>identification</td><td><table><tr><td>Optional: No</td></tr><tr><td>Type: String</td></tr></table></td></table></tr>
@@ -188,7 +188,7 @@ new_sample is of the type <class 'hubmap_sdk.entitysdk.Sample'>
 <tr><td>Authorization</td><td>No token is required for this method. If a token is provided and it is invalid, an exception will be raised. If a token is not provided, or if a valid token is provided and the token is not part of HuBMAP-Read group, only entities that are public will be returned</td></tr>
 </table>
 
-#####Get Entity Provenance 
+##### Get Entity Provenance 
 
 <table>
 <tr><td>Description</td><td>Takes in an id (HuBMAP ID or UUID) and returns a dictionary with the provenance tree above the given ID. Optionally accepts an integer "depth" which will limit the size of the returned tree.</td></tr>
@@ -214,7 +214,7 @@ The type of the returned provenance is <class 'dict'>
 <tr><td>Authorization</td><td>No token is required for this method. If a token is provided and it is invalid, an exception will be raised. If a token is not provided, or if a valid token is provided and the token is not part of HuBMAP-Read group, only entities that are public will be returned</td></tr>
 </table>
 
-#####Get Entity Types
+##### Get Entity Types
 
 <table>
 <tr><td>Description</td><td>This method returns a list of all available entity types as defined in the schema yaml https://raw.githubusercontent.com/hubmapconsortium/entity-api/test-release/entity-api-spec.yaml</td></tr>
