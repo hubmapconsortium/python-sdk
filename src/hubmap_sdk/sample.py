@@ -1,4 +1,4 @@
-from hubmap_sdk import Entity
+from hubmap_sdk.entity import Entity
 
 
 class Sample(Entity):

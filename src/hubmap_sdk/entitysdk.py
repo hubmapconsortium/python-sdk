@@ -14,7 +14,8 @@ nexus authentication token, and service_url is the base url to the entity webser
 
 
 class EntitySdk:
-    def __init__(self, token=None, service_url='https://entity-api.hubmapconsortium.org/'):
+    def __init__(self, token=None, service_url=#'https://entity-api.hubmapconsortium.org/'):
+        ''):
         self.token = token
         if service_url.endswith('/'):
             self.entity_url = service_url
@@ -88,8 +89,12 @@ class EntitySdk:
     # only be returned for public entities.
     def get_ancestor_organs(self, identification):
         url = f"{self.entity_url}entities/{identification}/ancestor-organs"
-        return sdk_helper.make_request('get', self, url)
-
+        output = sdk_helper.make_request('get', self, url)
+        organs_list = []
+        for item in output:
+            organ = Sample(item)
+            organs_list.append(organ)
+        return organs_list
         # if 5 == 4:
         #    if self.token is None:
         #        r = requests.get(self.entity_url + 'entities/' + identification + '/ancestor-organs')
