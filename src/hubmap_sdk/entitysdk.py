@@ -202,7 +202,28 @@ class EntitySdk:
         #     if r.status_code > 399:
         #         err = r.json()['error']
         #         raise Exception(err)
-        return r
+        list_of_entities = []
+        if entity_type.lower() == 'dataset':
+            for item in r:
+                new_instance = Dataset(item)
+                list_of_entities.append(new_instance)
+        if entity_type.lower() == 'donor':
+            for item in r:
+                new_instance = Donor(item)
+                list_of_entities.append(new_instance)
+        if entity_type.lower() == 'sample':
+            for item in r:
+                new_instance = Sample(item)
+                list_of_entities.append(new_instance)
+        if entity_type.lower() == 'collection':
+            for item in r:
+                new_instance = Collection(item)
+                list_of_entities.append(new_instance)
+        if entity_type.lower() == 'upload':
+            for item in r:
+                new_instance = Upload(item)
+                list_of_entities.append(new_instance)
+        return list_of_entities
 
     # Takes an id (HuBMAP ID or UUID) for a collection. Returns the details of the collection in the form of a
     # dictionary with the attached datasets. If no token, or a valid token with no HuBMAP-Read group membership, then
@@ -218,7 +239,8 @@ class EntitySdk:
         #     if r.status_code > 399:
         #         err = r.json()['error']
         #         raise Exception(err)
-        return r
+        new_instance = Collection(r)
+        return new_instance
 
     # Returns a list of all public collections. No token is required, however if one is provided, it must be valid.
     # Results can be filtered to only show individual properties with an optional argument 'property_key' which is none
