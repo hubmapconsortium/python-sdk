@@ -1,10 +1,6 @@
 import requests
 
 
-def create_entity_instance():
-    pass
-
-
 def make_request(method_type, instance, url, optional_argument=None, data=None):
     if optional_argument is None:
         optional_argument = ''
