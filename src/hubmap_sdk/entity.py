@@ -25,3 +25,6 @@ class Entity:
         #     self.last_modified_user_email = dictionary['last_modified_user_email']
         # if dictionary['entity_type'] is not None:
         #     self.entity_type = dictionary['entity_type']
+
+    def get_uuid(self):
+        return self.uuid
