@@ -41,4 +41,8 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
         error = err
         raise Exception(error)
     else:
-        return r.json()
+        try:
+            return r.json()
+        except:
+            return r.text
+

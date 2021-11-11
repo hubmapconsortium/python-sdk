@@ -297,14 +297,14 @@ class EntitySdk:
     # A token is required.
     def create_multiple_samples(self, count, data):
         result = []
-        r = requests.post(self.entity_url + "entities/multiple-samples/" + count, headers=self.header, json=data)
+        r = requests.post(f"{self.entity_url}entities/multiple-samples/{count}", headers=self.header, json=data)
         if r.status_code > 299:
             err = r.json()['error']
             raise Exception(err)
         else:
             sample_list = r.json()
             for output in sample_list:
-                sample_instance = EntitySdk.create_sample(output)
+                sample_instance = Sample(output)
                 result.append(sample_instance)
         return result
 
@@ -313,6 +313,12 @@ class EntitySdk:
     # object is returned of the relevant class containing all the information of the entity.
     def update_entity(self, identification, data):
         r = requests.put(self.entity_url + 'entities/' + identification, headers=self.header, json=data)
+        if r.status_code > 299:
+            if r.status_code == 401:
+                raise Exception("401 Authorization Required. No Token or Invalid Token Given")
+            err = r.json()['error']
+            error = err
+            raise Exception(error)
         output = r.json()
         if output['entity_type'].lower() == 'dataset':
             new_instance = Dataset(output)
@@ -503,7 +509,7 @@ class EntitySdk:
             err = r.json()['error']
             raise Exception(err)
         else:
-            return "success"
+            return "Successfully added all the specified datasets to the target collection"
 
     # Returns the globus url for an entity given by an id (HuBMAP ID or UUID). A token is not required, but if one is
     # given it must be valid. If a token is not given, or if the user does not have HuBMAP-Read group access, a globus
@@ -536,7 +542,7 @@ class EntitySdk:
         #     if r.status_code > 399:
         #         err = r.json()['error']
         #         raise Exception(err)
-        new_dataset = EntitySdk.create_dataset(r)
+        new_dataset = Dataset(r)
         return new_dataset
 
     # Takes an id to a dataset (HuBMAP ID or UUID) and returns the revision number as an integer. If the dataset of the
@@ -566,10 +572,12 @@ class EntitySdk:
         r = requests.get(self.entity_url + 'datasets/' + identification + '/retract', headers=self.header,
                          json=retract_json)
         if r.status_code > 399:
+            if r.status_code == 401:
+                raise Exception("401 Authorization Required. No Token or Invalid Token Given")
             err = r.json()
             raise Exception(err)
         else:
-            new_dataset = EntitySdk.create_dataset(r.json())
+            new_dataset = Dataset(r.json())
             return new_dataset
 
     # Returns a list of all revisions from a given id (HuBMAP ID or UUID). The id can be for any revision in the chain.
@@ -580,6 +588,8 @@ class EntitySdk:
     # public datasets will be returned. If the id given itself is not public, and a token with read access is not given,
     # an error will be raised.
     def get_revisions_list(self, identification, include_dataset=False):
+        if include_dataset != True:
+            include_dataset = False
         if self.token is None:
             if include_dataset is False:
                 r = requests.get(self.entity_url + 'datasets/' + identification + '/revisions')
