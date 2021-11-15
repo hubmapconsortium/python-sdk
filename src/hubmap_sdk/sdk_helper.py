@@ -35,8 +35,8 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
             if method_type == 'post':
                 r = requests.get(url + optional_argument, headers=instance.header, json=data)
     if r.status_code > 299:
-        if r.status_code == 401:
-            raise Exception("401 Authorization Required. No Token or Invalid Token Given")
+        # if r.status_code == 401:
+        #     raise Exception("401 Authorization Required. No Token or Invalid Token Given")
         err = r.json()['error']
         error = err
         raise Exception(error)

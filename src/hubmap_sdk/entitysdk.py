@@ -121,21 +121,6 @@ class EntitySdk:
         if property_key is not None:
             property_key = f"?property={property_key}"
         r = sdk_helper.make_request('get', self, url, property_key)
-        # if 5 == 4:
-        #     if self.token is None:
-        #         if property_key is None:
-        #             r = requests.get(self.entity_url + "entities/" + identification)
-        #         else:
-        #             r = requests.get(self.entity_url + "entities/" + identification + "?property=" + property_key)
-        #     else:
-        #         if property_key is None:
-        #             r = requests.get(self.entity_url + "entities/" + identification, headers=self.header)
-        #         else:
-        #             r = requests.get(self.entity_url + "entities/" + identification + "?property=" + property_key,
-        #                              headers=self.header)
-        #     if r.status_code > 399:
-        #         err = r.json()['error']
-        #         raise Exception(err)
 
         entity_type = r['entity_type']
         if entity_type.lower() == 'dataset':
@@ -156,23 +141,6 @@ class EntitySdk:
         url = f"{self.entity_url}entities/{identification}/provenance"
         depth = f"?depth={depth}"
         r = sdk_helper.make_request('get', self, url, depth)
-        # if 5 == 4:
-        #     if self.token is None:
-        #         if depth is None:
-        #             r = requests.get(self.entity_url + "entities/" + identification + "/provenance")
-        #         else:
-        #             r = requests.get(self.entity_url + "entities/" +
-        #                              identification + "/provenance" + "?depth=" + depth)
-        #     else:
-        #         if depth is None:
-        #             r = requests.get(self.entity_url + "entities/" + identification +
-        #                              "/provenance", headers=self.header)
-        #         else:
-        #             r = requests.get(self.entity_url + "entities/" + identification + "/provenance" + "?depth=" +
-        #                              depth, headers=self.header)
-        #     if r.status_code > 399:
-        #         err = r.json()['error']
-        #         raise Exception(err)
         return r
 
     # returns a list of all available entity types as defined in the schema yaml
@@ -181,14 +149,6 @@ class EntitySdk:
     def get_entity_types(self):
         url = f"{self.entity_url}entity-types"
         r = sdk_helper.make_request('get', self, url)
-        # if 5 == 4:
-        #     if self.token is None:
-        #         r = requests.get(self.entity_url + "entity-types/")
-        #     else:
-        #         r = requests.get(self.entity_url + "entity-types/", headers=self.header)
-        #     if r.status_code > 399:
-        #         err = r.json()['error']
-        #         raise Exception(err)
         return r
 
     # Takes as input an entity type and returns a list of all entities within that given type. Optionally, rather than
@@ -201,19 +161,6 @@ class EntitySdk:
         if property_key is not None:
             property_key = '?property=' + property_key
         r = sdk_helper.make_request('get', self, url, property_key)
-        # if 5 == 4:
-        #     if self.token is None:
-        #         raise Exception("A token is required for get_entities_by_type. The instance of entity-api calling "
-        #                         "get_entities_by_type has a token value of None")
-        #     else:
-        #         if property_key is None:
-        #             r = requests.get(self.entity_url + entity_type + "/entities", headers=self.header)
-        #         else:
-        #             r = requests.get(self.entity_url + entity_type + "/entities?property=" + property_key,
-        #                              headers=self.header)
-        #     if r.status_code > 399:
-        #         err = r.json()['error']
-        #         raise Exception(err)
         list_of_entities = []
         if entity_type.lower() == 'dataset':
             for item in r:
@@ -273,22 +220,13 @@ class EntitySdk:
         if property_key is not None:
             property_key = '?property=' + property_key
         r = sdk_helper.make_request('get', self, url, property_key)
-        # if 5 == 4:
-        #     if self.token is None:
-        #         if property_key is None:
-        #             r = requests.get(self.entity_url + "collections")
-        #         else:
-        #             r = requests.get(self.entity_url + "collections" + property_key)
-        #     else:
-        #         if property_key is None:
-        #             r = requests.get(self.entity_url + "collections", headers=self.header)
-        #         else:
-        #             r = requests.get(self.entity_url + "collections" + property_key, headers=self.header)
-        #
-        #     if r.status_code > 399:
-        #         err = r.json()['error']
-        #         raise Exception(err)
-        return r
+        list_of_collections = []
+        for item in r:
+            if isinstance(item, str):
+                item = {property_key: item}
+            new_collection = Collection(item)
+            list_of_collections.append(new_collection)
+        return list_of_collections
 
     # Creates multiple samples from the same source. Accepts a dictionary containing the information of the new entity
     # and an integer designating how many samples to create. Returns a list of the newly created sample objects.
@@ -342,21 +280,7 @@ class EntitySdk:
         if property_key is not None:
             property_key = '?property=' + property_key
         r = sdk_helper.make_request('get', self, url, property_key)
-        # if 5 == 4:
-        #     if self.token is None:
-        #         if property_key is None:
-        #             r = requests.get(self.entity_url + "ancestors/" + identification)
-        #         else:
-        #             r = requests.get(self.entity_url + "ancestors/" + identification + "?property=" + property_key)
-        #     else:
-        #         if property_key is None:
-        #             r = requests.get(self.entity_url + "ancestors/" + identification, headers=self.header)
-        #         else:
-        #             r = requests.get(self.entity_url + "ancestors/" + identification + "?property=" + property_key,
-        #                              headers=self.header)
-        #     if r.status_code > 399:
-        #         err = r.json()['error']
-        #         raise Exception(err)
+
         return r
 
     # Returns a list of all the descendants of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
@@ -572,9 +496,12 @@ class EntitySdk:
         r = requests.get(self.entity_url + 'datasets/' + identification + '/retract', headers=self.header,
                          json=retract_json)
         if r.status_code > 399:
-            if r.status_code == 401:
-                raise Exception("401 Authorization Required. No Token or Invalid Token Given")
-            err = r.json()
+            # if r.status_code == 401:
+            #     raise Exception("401 Authorization Required. No Token or Invalid Token Given")
+            try:
+                err = r.json()
+            except:
+                err = r.text
             raise Exception(err)
         else:
             new_dataset = Dataset(r.json())

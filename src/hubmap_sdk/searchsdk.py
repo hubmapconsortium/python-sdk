@@ -12,8 +12,9 @@ class SearchSdk:
             self.search_url = service_url + '/'
         self.header = {'Authorization': 'Bearer ' + self.token}
 
-    def assaytypes(self, key=None):
+    def assaytype(self, key=None):
         url = f"{self.search_url}assaytype"
+        key = f"?{key}"
         output = sdk_helper.make_request('get', self, url, optional_argument=key)
         return output
 
