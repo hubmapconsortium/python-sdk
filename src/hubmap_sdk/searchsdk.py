@@ -4,7 +4,7 @@ from hubmap_sdk import sdk_helper
 class SearchSdk:
 
     def __init__(self, token, service_url=#https://search-api.hubmapconsortium.org/):
-         ''):
+                 ''):
         self.token = token
         if service_url.endswith('/'):
             self.search_url = service_url
@@ -39,8 +39,8 @@ class SearchSdk:
         output = sdk_helper.make_request('get', self, url, data=data)
         return output
 
-    def count_by_index(self, data, index_without_previs):
-        url = f"{self.search_url}{index_without_previs}/count"
+    def count_by_index(self, data, index_without_prefix):
+        url = f"{self.search_url}{index_without_prefix}/count"
         output = sdk_helper.make_request('get', self, url, data=data)
         return output
 

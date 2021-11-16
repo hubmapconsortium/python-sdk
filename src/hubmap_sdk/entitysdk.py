@@ -31,8 +31,9 @@ class EntitySdk:
     def create_entity(self, entity_type, data):
         # If an entity_type given is not one of the accepted entity types, an exception will be raised.
         if entity_type.lower() not in ['donor', 'sample', 'dataset', 'upload', 'collection']:
-            raise Exception("Accepted entity types are (case-insensitive):" +
-                            " 'donor', 'sample', 'dataset', 'upload', or 'collection'")
+            error_message = "Accepted entity types are (case-insensitive): 'donor', 'sample', 'dataset', 'upload', or " \
+                            "'collection'"
+            raise sdk_helper.HTTPException(error_message, 400)
         # If the request to entity-api fails, an exception will be raised.
         url = f"{self.entity_url}entities/{entity_type}"
         output = sdk_helper.make_request('post', self, url, data=data)
