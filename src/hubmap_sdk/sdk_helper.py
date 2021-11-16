@@ -1,3 +1,5 @@
+import json.decoder
+
 import requests
 from hubmap_sdk import Donor, Dataset, Sample, Collection, Upload
 
@@ -55,12 +57,33 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
     if r.status_code > 299:
         # if r.status_code == 401:
         #     raise Exception("401 Authorization Required. No Token or Invalid Token Given")
-        err = r.json()['error']
-        error = err
-        raise Exception(error)
+        try:
+            error = r.json()['error']
+        except json.decoder.JSONDecodeError:
+            if r.text.startswith('<html>'):
+                start_index = r.text.find('401')
+                end_index = r.text.find('Required') + 8
+                error = r.text[start_index:end_index]
+            else:
+                raise json.decoder.JSONDecodeError
+        raise HTTPException(error, r.status_code)
     else:
         try:
             return r.json()
-        except:
+        except json.decoder.JSONDecodeError:
             return r.text
+
+
+class HTTPException(Exception):
+
+    def __init__(self, description, status_code):
+        Exception.__init__(self, description)
+        self.status_code = status_code
+        self.description = description
+
+    def get_status_code(self):
+        return self.status_code
+
+    def get_description(self):
+        return self.description
 

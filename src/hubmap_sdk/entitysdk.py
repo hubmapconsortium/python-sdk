@@ -1,11 +1,11 @@
-from hubmap_sdk import Donor, Sample, Collection, Upload, Dataset, sdk_helper
+from hubmap_sdk import Sample, Collection, Dataset, sdk_helper
 import requests
 
 """
 The entity-api class is the mechanism by which functions of the entity api are interacted. 
 Create an instance of the class and give it the optional arguments 'token' and 'service_url'. Token is a Globus
-nexus authentication token, and service_url is the base url to the entity webservice you would like to use. These are
- "https://entity-apihubmapconsortium.org" for the production sever, "https://entity-api.dev.hubmapconsortium.org" for 
+ authentication token, and service_url is the base url to the entity webservice you would like to use. These are
+ "https://entity.api.hubmapconsortium.org" for the production sever, "https://entity-api.dev.hubmapconsortium.org" for 
  the DEV server, "https://entity-api.test.hubmapconsortium.org" for the TEST server, 
  "https://entity-api.stage.hubmapconsortium.org" for the STAGE server or use a localhost. If no token is given, only 
  functionality designated for public access will be usable. If no service_url is given, all requests will be made 
@@ -14,7 +14,7 @@ nexus authentication token, and service_url is the base url to the entity webser
 
 
 class EntitySdk:
-    def __init__(self, token=None, service_url= ''):
+    def __init__(self, token=None, service_url='https://entity.api.hubmapconsortium.org/'):
         self.token = token
         if service_url.endswith('/'):
             self.entity_url = service_url
@@ -70,6 +70,7 @@ class EntitySdk:
         return organs_list
 
     # takes the id of an entity (HuBMAP ID or UUID) and returns an instance of the entity corresponding to the ID given
+    # This method requires a token.
     def get_entity_by_id(self, identification):
         url = f"{self.entity_url}entities/{identification}"
         output = sdk_helper.make_request('get', self, url)
@@ -77,7 +78,8 @@ class EntitySdk:
         return new_instance
 
     # Takes in an id (HuBMAP ID or UUID) and returns a dictionary with the provenance tree above the given ID.
-    # Optionally accepts an integer "depth" which will limit the size of the returned tree.
+    # Optionally accepts an integer "depth" which will limit the size of the returned tree. This method requires a
+    # token
     def get_entity_provenance(self, identification, depth=None):
         url = f"{self.entity_url}entities/{identification}/provenance"
         depth = f"?depth={depth}"
@@ -92,11 +94,8 @@ class EntitySdk:
         output = sdk_helper.make_request('get', self, url)
         return output
 
-    # Takes as input an entity type and returns a list of all entities within that given type. Optionally, rather than
-    # Returning all of the information about the entities, it is possible to filter such that only a certain property
-    # is returned for each. This is given by the value "property_key". For example, you could retrieve a list of all
-    # donors, and chose to only have the uuid of each included in the list with
-    # get_entities_by_type('donor', property_key='uuid')
+    # Takes as input an entity type as a string and returns a list of all entities within that given type. This method
+    # requires a token
     def get_entities_by_type(self, entity_type):
         url = f"{self.entity_url}{entity_type}/entities"
         output = sdk_helper.make_request('get', self, url)
@@ -116,9 +115,6 @@ class EntitySdk:
         return new_instance
 
     # Returns a list of all public collections. No token is required, however if one is provided, it must be valid.
-    # Results can be filtered to only show individual properties with an optional argument 'property_key' which is none
-    # by default. For example, to return a list of all public collections but to only have the uuid of each, call
-    # get_collections('uuid')
     def get_collections(self):
         url = f"{self.entity_url}collections"
         output = sdk_helper.make_request('get', self, url)
@@ -128,8 +124,8 @@ class EntitySdk:
             list_of_collections.append(new_collection)
         return list_of_collections
 
-    # Creates multiple samples from the same source. Accepts a dictionary containing the information of the new entity
-    # and an integer designating how many samples to create. Returns a list of the newly created sample objects.
+    # Creates multiple samples from the same source. Accepts a dictionary containing the information of the source
+    # entity and an integer designating how many samples to create. Returns a list of the newly created sample objects.
     # 'direct_ancestor_uuid' is a required field in the dictionary. An example of a valid call would be:
     # create_multiple_samples(5, data) where data is the dictionary containing the information about the new entities.
     # A token is required.
@@ -152,10 +148,8 @@ class EntitySdk:
         return new_instance
 
     # Returns a list of all the ancestors of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
-    # Optionally accepts an argument "property_key" which allows filtering by a specific property. For example, to
-    # return a list of ancestors for a given entity and only returning the UUID's, use get_ancestors(id, 'UUID'). No
-    # Token is required, however if a token is given, it must be valid. If no token is given or token is not for a user
-    # in the Hubmap-Read group, ancestors will only be returned for public entities
+    # No token is required, however if a token is given, it must be valid. If no token is given or token is not for a
+    # user in the Hubmap-Read group, ancestors will only be returned for public entities
     def get_ancestors(self, identification):
         list_of_ancestors = []
         url = f"{self.entity_url}ancestors/{identification}"
@@ -166,10 +160,8 @@ class EntitySdk:
         return list_of_ancestors
 
     # Returns a list of all the descendants of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
-    # Optionally accepts an argument "property_key" which allows filtering by a specific property. For example, to
-    # return a list of descendants for a given entity and only returning the UUID's, use get_descendants(id, 'UUID'). No
-    # Token is required, however if a token is given, it must be valid. If no token is given or token is not for a user
-    # in the Hubmap-Read group, descendants will only be returned for public entities
+    # No token is required, however if a token is given, it must be valid. If no token is given or token is not for a
+    # user in the Hubmap-Read group, descendants will only be returned for public entities
     def get_descendants(self, identification):
         list_of_descendants = []
         url = f"{self.entity_url}descendants/{identification}"
@@ -179,11 +171,9 @@ class EntitySdk:
             list_of_descendants.append(new_instance)
         return list_of_descendants
 
-    # Returns a list of the parents of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
-    # Optionally accepts an argument "property_key" which allows filtering by a specific property. For example, to
-    # return a list of parents for a given entity and only returning the UUID's, use get_parents(id, 'UUID'). No
-    # Token is required, however if a token is given, it must be valid. If no token is given or token is not for a user
-    # in the Hubmap-Read group, parents will only be returned for public entities
+    # Returns a list of all the parents of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
+    # No token is required, however if a token is given, it must be valid. If no token is given or token is not for a
+    # user in the Hubmap-Read group, parents will only be returned for public entities
     def get_parents(self, identification):
         list_of_parents = []
         url = f"{self.entity_url}parents/{identification}"
@@ -193,11 +183,9 @@ class EntitySdk:
             list_of_parents.append(new_instance)
         return list_of_parents
 
-    # Returns a list of the children of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
-    # Optionally accepts an argument "property_key" which allows filtering by a specific property. For example, to
-    # return a list of children for a given entity and only returning the UUID's, use get_children(id, 'UUID'). No
-    # Token is required, however if a token is given, it must be valid. If no token is given or token is not for a user
-    # in the Hubmap-Read group, children will only be returned for public entities
+    # Returns a list of all the parents of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
+    # No token is required, however if a token is given, it must be valid. If no token is given or token is not for a
+    # user in the Hubmap-Read group, parents will only be returned for public entities
     def get_children(self, identification):
         list_of_children = []
         url = f"{self.entity_url}children/{identification}"
@@ -208,11 +196,8 @@ class EntitySdk:
         return list_of_children
 
     # Returns a list of the previous revisions of a given entity. Accepts an id (HuBMAP ID or UUID) for the target
-    # entity. Optionally accepts an argument "property_key" which allows filtering by a specific property. For example,
-    # to return a list of  previous revisions for a given entity and only returning the UUID's, use
-    # get_previous_revisions(id, 'UUID'). No token is required, however if a token is given, it must be valid. If no
-    # token is given or token is not for a user in the Hubmap-Read group, previous revisions will only be returned for
-    # public entities
+    # entity. No token is required, however if a token is given, it must be valid. If no token is given or token is not
+    # for a user in the Hubmap-Read group, previous revisions will only be returned for public entities
     def get_previous_revisions(self, identification):
         list_of_previous_revisions = []
         url = f"{self.entity_url}previous_revisions/{identification}"
@@ -223,11 +208,8 @@ class EntitySdk:
         return list_of_previous_revisions
 
     # Returns a list of the next revisions of a given entity. Accepts an id (HuBMAP ID or UUID) for the target
-    # entity. Optionally accepts an argument "property_key" which allows filtering by a specific property. For example,
-    # to return a list of  next revisions for a given entity and only returning the UUID's, use
-    # get_next_revisions(id, 'UUID'). No token is required, however if a token is given, it must be valid. If no
-    # token is given or token is not for a user in the Hubmap-Read group, next revisions will only be returned for
-    # public entities
+    # entity. No token is required, however if a token is given, it must be valid. If no token is given or token is not
+    # for a user in the Hubmap-Read group, next revisions will only be returned for public entities
     def get_next_revisions(self, identification):
         url = f"{self.entity_url}next_revisions/{identification}"
         output = sdk_helper.make_request('get', self, url)
