@@ -233,9 +233,9 @@ class EntitySdk:
         r = sdk_helper.make_request('get', self, url)
         return r
 
-    # Returns a dataset object corresponding to a given id (HuBMAP ID or UUID). A token is not required, but if one is
-    # provided, it must be valid. If a token is not given, or if the user does not have HuBMAP-Read group access, then
-    # the last published dataset will be returned.
+    # Returns a dataset object corresponding to the most recent revision of the dataset given by the id (HuBMAP ID or
+    # UUID). A token is not required, but if one is provided, it must be valid. If a token is not given, or if the user
+    # does not have HuBMAP-Read group access, then the last published dataset will be returned.
     def get_dataset_latest_revision(self, identification):
         url = f"{self.entity_url}datasets/{identification}/latest-revision"
         output = sdk_helper.make_request('get', self, url)
@@ -283,7 +283,9 @@ class EntitySdk:
             new_instance = Dataset(item)
             list_of_revisions.append(new_instance)
 
-    #Returns a list of all associated organs from a given id (HuBMAP ID or UUID).
+    # Returns a list of all associated organs from a given id (HuBMAP ID or UUID). Does not require a token, however if
+    # a token is given, it must be valid. If no token is given, or no HuBMAP-Read group access, only public datasets
+    # will be accepted, and only public organs will be returned
     def get_associated_organs_from_dataset(self, identification):
         list_or_organs = []
         url = f"{self.entity_url}datasets/{identification}/organs"
