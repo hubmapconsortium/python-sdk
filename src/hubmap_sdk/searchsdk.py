@@ -66,15 +66,9 @@ class SearchSdk:
     def reindex(self, uuid):
         url = f"{self.search_url}reindex/{uuid}"
         output = sdk_helper.make_request('put', self, url)
-        if output[1] == 202:
-            return output[0]
-        else:
-            return f"reindex failed for uuid: {uuid}"
+        return output, 202
 
     def reindex_all(self):
         url = f"{self.search_url}reindex-all"
         output = sdk_helper.make_request('put', self, url)
-        if output[1] == 202:
-            return output[0]
-        else:
-            return f"reindex-all failed"
+        return output, 202
