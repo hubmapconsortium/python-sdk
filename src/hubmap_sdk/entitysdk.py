@@ -280,9 +280,18 @@ class EntitySdk:
         if include_dataset:
             dataset_include = '?include_dataset=True'
         output = sdk_helper.make_request('get', self, url, dataset_include)
-        for item in output:
-            new_instance = Dataset(item)
-            list_of_revisions.append(new_instance)
+        if not include_dataset:
+            return output
+        else:
+            for item in output:
+                dict_with_dataset_object = {}
+                new_dataset = Dataset(item['dataset'])
+                dict_with_dataset_object['revision_number'] = item['revision_number']
+                dict_with_dataset_object['dataset_uuid'] = item['dataset_uuid']
+                dict_with_dataset_object['dataset'] = new_dataset
+                list_of_revisions.append(dict_with_dataset_object)
+            return list_of_revisions
+
 
     # Returns a list of all associated organs from a given id (HuBMAP ID or UUID). Does not require a token, however if
     # a token is given, it must be valid. If no token is given, or no HuBMAP-Read group access, only public datasets
