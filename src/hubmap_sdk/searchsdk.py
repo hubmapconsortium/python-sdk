@@ -1,3 +1,5 @@
+import requests
+
 from hubmap_sdk import sdk_helper
 
 
@@ -51,10 +53,16 @@ class SearchSdk:
         return indices
 
     def status(self):
-        url = f"{self.search_url}status"
-        output = sdk_helper.make_request('get', self, url)
+        try:
+            r = requests.get(self.search_url + 'status')
+        except Exception as e:
+            print(e)
+            return e
+        output = r.json()
+        if r.status_code < 300:
+            print(f"build: {output['build']}, elasticsearch_connection: {output['elasticsearch_connection']}, "
+                  f"elasticsearch_status: {output['elasticsearch_status']}, version: {output['version']}")
         return output
-
     def reindex(self, uuid):
         url = f"{self.search_url}reindex/{uuid}"
         output = sdk_helper.make_request('put', self, url)
