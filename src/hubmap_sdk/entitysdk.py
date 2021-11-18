@@ -163,9 +163,9 @@ class EntitySdk:
     # Returns a list of all the descendants of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
     # No token is required, however if a token is given, it must be valid. If no token is given or token is not for a
     # user in the Hubmap-Read group, descendants will only be returned for public entities
-    def get_descendants(self, identification):
+    def get_descendants(self, identifier):
         list_of_descendants = []
-        url = f"{self.entity_url}descendants/{identification}"
+        url = f"{self.entity_url}descendants/{identifier}"
         output = sdk_helper.make_request('get', self, url)
         for item in output:
             new_instance = sdk_helper.make_entity(item)
