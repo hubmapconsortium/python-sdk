@@ -7,11 +7,10 @@ setup(
     name="hubmap-sdk",
     version="1.0.0",
     author="Hubmap",
-    author_email="help@hubmapconsortium.org",
+    author_email="api-developers@hubmapconsortium.org",
     description="Python Client Libary to use HuBMAP web services",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="github.com/hubmapconsortium.org/python-sdk",
     packages=['hubmap_sdk'],
     keywords=[
         "HuBMAP Sdk",
