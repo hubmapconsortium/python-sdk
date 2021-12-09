@@ -1,0 +1,11 @@
+{
+  "entity-api": {
+    "openapi-url": "https://raw.githubusercontent.com/hubmapconsortium/entity-api/test-release/entity-api-spec.yaml"
+  },
+    "ontology-api": {
+    "openapi-url": "https://raw.githubusercontent.com/hubmapconsortium/ontology-api/master/ontology-api-spec.yaml"
+  },
+   "search-api": {
+    "openapi-url": "https://raw.githubusercontent.com/hubmapconsortium/search-api/test-release/search-api-spec.yaml"
+  }
+}
