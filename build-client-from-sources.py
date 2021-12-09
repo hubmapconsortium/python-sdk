@@ -16,10 +16,10 @@ class RawTextArgumentDefaultsHelpFormatter(
 # https://docs.python.org/3/howto/argparse.html
 parser = argparse.ArgumentParser(
     description='Rebuild the python-sdk from the constituent openapi specs.\n'
-                'If no argument given then all will be built if arguments are given then only build those',
+                'If no arguments are given then all will be built',
     formatter_class=RawTextArgumentDefaultsHelpFormatter)
 parser.add_argument('modules', nargs='*',
-                    help='name of the modules to rebuild')
+                    help='name of the modules to rebuild. if not specified then all will be rebuilt')
 parser.add_argument("-s", "--sources", type=str, default='./sources.json',
                     help='file containing the sources for the openapi specs')
 parser.add_argument("-v", "--verbose", action="store_true",
