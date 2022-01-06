@@ -1,5 +1,6 @@
 from hubmap_sdk import Sample, Collection, Dataset, sdk_helper
 import requests
+import csv
 
 """
 The entity-api class is the mechanism by which functions of the entity api are interacted. 
@@ -83,7 +84,8 @@ class EntitySdk:
     # token
     def get_entity_provenance(self, identifier, depth=None):
         url = f"{self.entity_url}entities/{identifier}/provenance"
-        depth = f"?depth={depth}"
+        if depth is not None:
+            depth = f"?depth={depth}"
         output = sdk_helper.make_request('get', self, url, depth)
         return output
 
@@ -304,3 +306,30 @@ class EntitySdk:
             new_instance = Dataset(item)
             list_or_organs.append(new_instance)
         return list_or_organs
+
+    # Returns provenance information for every dataset. Output is a list of dictionaries, where each dictionary contains
+    # information on a given dataset. Optional parameters are has_rui_info (acceptable values are 'true' or 'false' and
+    # are case-insensitive), organ (accepts an organ code for a given organ, case-insensitive), group_uuid (accepts a
+    # uuid for a given group), and dataset status (acceptable values are 'published', 'qa', and 'new' and is case-
+    # insensitive.
+    def get_prov_info(self, has_rui_info=None, organ=None, group_uuid=None, dataset_status=None):
+        url = f"{self.entity_url}datasets/prov-info"
+        arguments = "?format=json"
+        if has_rui_info is not None:
+            arguments = arguments + "&has_rui_info=" + has_rui_info
+        if organ is not None:
+            arguments = arguments + "&organ=" + organ
+        if group_uuid is not None:
+            arguments = arguments + "&group_uuid=" +group_uuid
+        if dataset_status is not None:
+            arguments = arguments + "&dataset_status=" + dataset_status
+        output = sdk_helper.make_request('get', self, url, arguments)
+        return output
+
+    # Returns the provenance information in the form of a dictionary for a given dataset given by its id (HuBMAP ID, or
+    # uuid).
+    def get_prov_info_by_id(self, identifier):
+        url = f"{self.entity_url}datasets/{identifier}/prov-info"
+        arguments = "?format=json"
+        output = sdk_helper.make_request('get', self, url, arguments)
+        return output

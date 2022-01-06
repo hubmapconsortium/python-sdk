@@ -3,7 +3,8 @@
 ---
 A Python interface to the various HuBMAP web services
 
-###Overview
+### Overview
+
 The hubmap sdk is a client library that allows for easy integration of the API's associated with HuBMAP. 
 
 ### Using hubmap-sdk
