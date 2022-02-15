@@ -8,6 +8,7 @@ A Python interface to the various HuBMAP web services
 The hubmap sdk is a client library that allows for easy integration of the API's associated with HuBMAP. 
 
 ### Using hubmap-sdk
+
 The hubmap-sdk library is available through PyPi via the command:
 
 ```bash
@@ -37,6 +38,7 @@ A prompt to enter login information to the hubmap Pypi account will appear
 
 
 ### Files 
+
 This code contains:
 
 **collection.py** Contains the Collection class. This is used for creation and modification of Collection objects.
