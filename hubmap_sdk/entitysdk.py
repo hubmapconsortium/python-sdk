@@ -315,7 +315,7 @@ class EntitySdk:
         url = f"{self.entity_url}datasets/prov-info"
         arguments = "?format=json"
         if has_rui_info is not None:
-            arguments = arguments + "&has_rui_info=" + has_rui_info
+            arguments = arguments + "&has_rui_info=" + str(has_rui_info)
         if organ is not None:
             arguments = arguments + "&organ=" + organ
         if group_uuid is not None:
