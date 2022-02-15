@@ -1,6 +1,5 @@
 from hubmap_sdk import Sample, Collection, Dataset, sdk_helper
 import requests
-import csv
 
 """
 The entity-api class is the mechanism by which functions of the entity api are interacted. 
