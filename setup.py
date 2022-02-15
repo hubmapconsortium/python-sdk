@@ -17,11 +17,11 @@ setup(
         "python"
     ],
     install_requires=[
-        "certifi>=2021.10.8",
-        "chardet>=4.0.0",
-        "idna>=2.10",
-        "requests>=2.25.1",
-        "urllib3>=1.26.7"
+        "certifi==2021.10.8",
+        "chardet==4.0.0",
+        "idna==2.10",
+        "requests==2.25.1",
+        "urllib3==1.26.7"
     ],
     include_package_data=True,
     classifiers=[
