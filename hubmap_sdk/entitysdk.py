@@ -30,6 +30,7 @@ class EntitySdk:
     # from entity-api.
     def create_entity(self, entity_type, data):
         # If an entity_type given is not one of the accepted entity types, an exception will be raised.
+        self.header['X-Hubmap-Application'] = 'ingest-api'
         if entity_type.lower() not in ['donor', 'sample', 'dataset', 'upload', 'collection']:
             error_message = "Accepted entity types are (case-insensitive): 'donor', 'sample', 'dataset', 'upload', or " \
                             "'collection'"
@@ -95,17 +96,6 @@ class EntitySdk:
         url = f"{self.entity_url}entity-types"
         output = sdk_helper.make_request('get', self, url)
         return output
-
-    # Takes as input an entity type as a string and returns a list of all entities within that given type. This method
-    # requires a token
-    def get_entities_by_type(self, entity_type):
-        url = f"{self.entity_url}{entity_type}/entities"
-        output = sdk_helper.make_request('get', self, url)
-        list_of_entities = []
-        for item in output:
-            new_instance = sdk_helper.make_entity(item)
-            list_of_entities.append(new_instance)
-        return list_of_entities
 
     # Takes an id (HuBMAP ID or UUID) for a collection. Returns the details of the collection in the form of a
     # dictionary with the attached datasets. If no token, or a valid token with no HuBMAP-Read group membership, then
@@ -213,10 +203,13 @@ class EntitySdk:
     # entity. No token is required, however if a token is given, it must be valid. If no token is given or token is not
     # for a user in the Hubmap-Read group, next revisions will only be returned for public entities
     def get_next_revisions(self, identifier):
+        list_of_next_revisions = []
         url = f"{self.entity_url}next_revisions/{identifier}"
         output = sdk_helper.make_request('get', self, url)
-        new_instance = Dataset(output)
-        return new_instance
+        for item in output:
+            new_instance = sdk_helper.make_entity(item)
+            list_of_next_revisions.append(new_instance)
+        return list_of_next_revisions
 
     # Accepts an id (HuBMAP ID or UUID) for a collection and a list of datasets. Links each dataset in the list to the
     # target collection. Requires a valid Token. Returns a string "Successfully added all the specified datasets to the
@@ -288,7 +281,7 @@ class EntitySdk:
                 dict_with_dataset_object = {}
                 new_dataset = Dataset(item['dataset'])
                 dict_with_dataset_object['revision_number'] = item['revision_number']
-                dict_with_dataset_object['dataset_uuid'] = item['dataset_uuid']
+                dict_with_dataset_object['dataset_uuid'] = item['uuid']
                 dict_with_dataset_object['dataset'] = new_dataset
                 list_of_revisions.append(dict_with_dataset_object)
             return list_of_revisions
@@ -302,7 +295,7 @@ class EntitySdk:
         url = f"{self.entity_url}datasets/{identifier}/organs"
         output = sdk_helper.make_request('get', self, url)
         for item in output:
-            new_instance = Dataset(item)
+            new_instance = Sample(item)
             list_or_organs.append(new_instance)
         return list_or_organs
 
@@ -319,7 +312,7 @@ class EntitySdk:
         if organ is not None:
             arguments = arguments + "&organ=" + organ
         if group_uuid is not None:
-            arguments = arguments + "&group_uuid=" +group_uuid
+            arguments = arguments + "&group_uuid=" + group_uuid
         if dataset_status is not None:
             arguments = arguments + "&dataset_status=" + dataset_status
         output = sdk_helper.make_request('get', self, url, arguments)

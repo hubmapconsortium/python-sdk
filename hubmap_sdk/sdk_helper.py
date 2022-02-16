@@ -59,6 +59,8 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
         #     raise Exception("401 Authorization Required. No Token or Invalid Token Given")
         try:
             error = r.json()['error']
+        except KeyError:
+            error = r.json()['message']
         except json.decoder.JSONDecodeError:
             if r.text.startswith('<html>'):
                 start_index = r.text.find('401')
