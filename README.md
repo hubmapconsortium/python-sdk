@@ -12,7 +12,7 @@ The hubmap sdk is a client library that allows for easy integration of the API's
 The hubmap-sdk library is available through PyPi via the command:
 
 ```bash
-pip3 hubmap-sdk
+pip3 install hubmap-sdk
 ```
 hubmap-sdk requirements can be found [here](requirements.txt)
 
