@@ -16,6 +16,13 @@ pip3 install hubmap-sdk
 ```
 hubmap-sdk requirements can be found [here](requirements.txt)
 
+## Documentation
+Documentation and examples can be found here
+
+* [hubmapsdk](https://software.docs.hubmapconsortium.org/sdk/hubmapsdk.html)
+* [entitysdk](https://software.docs.hubmapconsortium.org/sdk/entitysdk.html)
+* [searchsdk](https://software.docs.hubmapconsortium.org/sdk/searchsdk.html)
+
 ### Building and Publishing hubmap-sdk
 
 <a href="https://pypi.org/project/setuptools/">SetupTools</a> and <a href="https://pypi.org/project/wheel/">Wheel</a> is required to build the sdk distribution. <a href="https://pypi.org/project/twine/">Twine</a> is required to publish to Pypi
