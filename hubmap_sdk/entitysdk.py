@@ -15,13 +15,14 @@ Create an instance of the class and give it the optional arguments 'token' and '
 
 class EntitySdk:
     def __init__(self, token=None, service_url='https://entity.api.hubmapconsortium.org/'):
+        self.header = {}
         self.token = token
         if service_url.endswith('/'):
             self.entity_url = service_url
         else:
             self.entity_url = service_url + '/'
         if token is not None:
-            self.header = {'Authorization': 'Bearer ' + self.token}
+            self.header['Authorization'] = f'Bearer {self.token}'
 
     # Using an instance of the EntitySdk class with appropriate authentication token, service_url as well as the
     # entity_type ('donor', 'sample', etc) and a dictionary containing the data for the new entity, an entity will be
