@@ -6,13 +6,14 @@ from hubmap_sdk import sdk_helper
 class SearchSdk:
 
     def __init__(self, token=None, service_url="https://search.api.hubmapconsortium.org/"):
+        self.header = {}
         self.token = token
         if service_url.endswith('/'):
             self.search_url = service_url
         else:
             self.search_url = service_url + '/'
         if token is not None:
-            self.header = {'Authorization': 'Bearer ' + self.token}
+            self.header['Authorization'] = f'Bearer {self.token}'
 
     def assaytype(self, key):
         url = f"{self.search_url}assaytype"
