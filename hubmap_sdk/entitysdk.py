@@ -326,3 +326,9 @@ class EntitySdk:
         arguments = "?format=json"
         output = sdk_helper.make_request('get', self, url, arguments)
         return output
+
+    # empty the entity cache for the given entity
+    def clear_cache(self, identifier):
+        url = f"{self.entity_url}flush-cache/{identifier}
+        output = sdk_helper.make_request('delete', self, url)
+        return output
