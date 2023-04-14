@@ -31,6 +31,9 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
                     r = requests.put(url + optional_argument)
                 if method_type == 'post':
                     r = requests.post(url + optional_argument)
+                if method_type == 'delete':
+                    r = requests.delete(url + optional_argument)
+
             else:
                 if method_type == 'get':
                     r = requests.get(url + optional_argument, headers=instance.header)
@@ -38,6 +41,8 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
                     r = requests.put(url + optional_argument, headers=instance.header)
                 if method_type == 'post':
                     r = requests.post(url + optional_argument, headers=instance.header)
+                if method_type == 'delete':
+                    r = requests.delete(url + optional_argument, headers=instance.header)
         else:
             if not isinstance(data, dict):
                 raise Exception("Data given must be a dictionary")
@@ -48,6 +53,8 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
                     r = requests.put(url + optional_argument, json=data)
                 if method_type == 'post':
                     r = requests.post(url + optional_argument, json=data)
+                if method_type == 'delete':
+                    r = requests.delete(url + optional_argument, json=data)
             else:
                 if method_type == 'get':
                     r = requests.get(url + optional_argument, headers=instance.header, json=data)
@@ -55,6 +62,8 @@ def make_request(method_type, instance, url, optional_argument=None, data=None):
                     r = requests.put(url + optional_argument, headers=instance.header, json=data)
                 if method_type == 'post':
                     r = requests.post(url + optional_argument, headers=instance.header, json=data)
+                if method_type == 'delete':
+                    r = requests.delete(url + optional_argument, headers=instance.header, json=data)
     except Exception:
         raise HTTPException("Connection Error. Check that service url is correct in instance of Entity Class", 404)
     if r.status_code > 299:
