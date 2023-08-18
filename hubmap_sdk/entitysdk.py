@@ -133,12 +133,11 @@ class EntitySdk:
 
     # Updates the properties of a given entity. Accepts the id (HuBMAP ID or UUID) for the target entity to update, as
     # well as a dictionary with the new/updated properties for the entity. A token is required to update an entity. An
-    # object is returned of the relevant class containing all the information of the entity.
+    # object is returned to show a simple message in the format: {'message': f"{normalized_entity_type} of {id} has been updated"}.
     def update_entity(self, identifier, data):
         url = f"{self.entity_url}entities/{identifier}"
-        output = sdk_helper.make_request('put', self, url, data=data)
-        new_instance = sdk_helper.make_entity(output)
-        return new_instance
+        result = sdk_helper.make_request('put', self, url, data=data)
+        return result
 
     # Returns a list of all the ancestors of a given entity. Accepts an id (HuBMAP ID or UUID) for the target entity.
     # No token is required, however if a token is given, it must be valid. If no token is given or token is not for a
