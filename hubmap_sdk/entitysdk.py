@@ -237,6 +237,14 @@ class EntitySdk:
         new_dataset = Dataset(output)
         return new_dataset
 
+    # Returns the 'organs', 'donors', and 'samples' uuids associated with the dataset given by the id (HuBMAP ID or UUID).
+    # These are returned as an object with keys 'organs', 'donors', and 'samples' each of which contain
+    # an array of uuids (e.g., {"organs": [...], "donors": [...], "samples": [...]}).
+    def get_datasets_organs_donors_samples_uuids(self, identifier):
+        url = f"{self.entity_url}datasets/{identifier}/organs-donors-samples-uuids"
+        output = sdk_helper.make_request('get', self, url)
+        return output
+
     # Takes an id to a dataset (HuBMAP ID or UUID) and returns the revision number as an integer. If the dataset of the
     # given id is not a revision of any other dataset, it will return 1. If it is the first revision of an original
     # dataset, it will return 2, and so on. A token is not required, however if a token is provided it must be valid.
