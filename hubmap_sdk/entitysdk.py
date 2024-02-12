@@ -1,4 +1,4 @@
-from hubmap_sdk import Sample, Collection, Dataset, sdk_helper
+from hubmap_sdk import Sample, Collection, Dataset, sdk_helper, Donor
 import requests
 
 """
@@ -298,6 +298,30 @@ class EntitySdk:
             new_instance = Sample(item)
             list_or_organs.append(new_instance)
         return list_or_organs
+
+    # Returns a list of all associated samples from a given id (HuBMAP ID or UUID). Does not require a token, however if
+    # a token is given, it must be valid. If no token is given, or no HuBMAP-Read group access, only public datasets
+    # will be accepted, and only public samples will be returned
+    def get_associated_samples_from_dataset(self, identifier):
+        list_or_samples = []
+        url = f"{self.entity_url}datasets/{identifier}/samples"
+        output = sdk_helper.make_request('get', self, url)
+        for item in output:
+            new_instance = Sample(item)
+            list_or_samples.append(new_instance)
+        return list_or_samples
+
+    # Returns a list of all associated donors from a given id (HuBMAP ID or UUID). Does not require a token, however if
+    # a token is given, it must be valid. If no token is given, or no HuBMAP-Read group access, only public datasets
+    # will be accepted, and only public donors will be returned
+    def get_associated_donors_from_dataset(self, identifier):
+        list_or_donors = []
+        url = f"{self.entity_url}datasets/{identifier}/donors"
+        output = sdk_helper.make_request('get', self, url)
+        for item in output:
+            new_instance = Donor(item)
+            list_or_donors.append(new_instance)
+        return list_or_donors
 
     # Returns provenance information for every dataset. Output is a list of dictionaries, where each dictionary contains
     # information on a given dataset. Optional parameters are has_rui_info (acceptable values are 'true' or 'false' and
