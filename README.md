@@ -19,9 +19,9 @@ hubmap-sdk requirements can be found [here](requirements.txt)
 ## Documentation
 Documentation and examples can be found here
 
-* [hubmapsdk](https://software.docs.hubmapconsortium.org/sdk/hubmapsdk.html)
-* [entitysdk](https://software.docs.hubmapconsortium.org/sdk/entitysdk.html)
-* [searchsdk](https://software.docs.hubmapconsortium.org/sdk/searchsdk.html)
+* [hubmapsdk](https://docs.hubmapconsortium.org/sdk/hubmapsdk.html)
+* [entitysdk](https://docs.hubmapconsortium.org/sdk/entitysdk.html)
+* [searchsdk](https://docs.hubmapconsortium.org/sdk/searchsdk.html)
 
 ### Building and Publishing hubmap-sdk
 
