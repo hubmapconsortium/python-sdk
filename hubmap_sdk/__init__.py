@@ -6,5 +6,6 @@ from hubmap_sdk.dataset import Dataset
 from hubmap_sdk.publication import Publication
 from hubmap_sdk.entitysdk import EntitySdk
 from hubmap_sdk.searchsdk import SearchSdk
+from hubmap_sdk.epicollection import Epicollection
 from hubmap_sdk.entity import Entity
 import hubmap_sdk.sdk_helper
