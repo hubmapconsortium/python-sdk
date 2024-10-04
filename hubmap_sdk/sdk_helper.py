@@ -1,7 +1,7 @@
 import json.decoder
 
 import requests
-from hubmap_sdk import Donor, Dataset, Sample, Collection, Upload, Publication
+from hubmap_sdk import Donor, Dataset, Sample, Collection, Upload, Publication, Epicollection
 
 
 
@@ -18,6 +18,8 @@ def make_entity(output):
         new_instance = Upload(output)
     if output['entity_type'].lower() == 'publication':
         new_instance = Publication(output)
+    if output['entity_type'].lower() == 'epicollection':
+        new_instance = Epicollection(output)
     return new_instance
 
 
