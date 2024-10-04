@@ -1,4 +1,4 @@
-from hubmap_sdk import Sample, Collection, Dataset, sdk_helper, Donor
+from hubmap_sdk import Sample, Collection, Dataset, sdk_helper, Donor, Epicollection
 import requests
 
 """
@@ -32,8 +32,8 @@ class EntitySdk:
     def create_entity(self, entity_type, data):
         # If an entity_type given is not one of the accepted entity types, an exception will be raised.
         self.header['X-Hubmap-Application'] = 'ingest-api'
-        if entity_type.lower() not in ['donor', 'sample', 'dataset', 'upload', 'collection']:
-            error_message = "Accepted entity types are (case-insensitive): 'donor', 'sample', 'dataset', 'upload', or " \
+        if entity_type.lower() not in ['donor', 'sample', 'dataset', 'upload', 'collection', 'publication', 'epicollection']:
+            error_message = "Accepted entity types are (case-insensitive): 'donor', 'sample', 'dataset', 'upload', 'publication', 'epicollection', or " \
                             "'collection'"
             raise sdk_helper.HTTPException(error_message, 400)
         # If the request to entity-api fails, an exception will be raised.
