@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="hubmap-sdk",
-    version="1.0.10",
+    version="1.0.11",
     author="Hubmap",
     author_email="api-developers@hubmapconsortium.org",
     description="Python Client Libary to use HuBMAP web services",
@@ -17,7 +17,6 @@ setup(
         "python"
     ],
     install_requires=[
-        "certifi==2021.10.8",
         "chardet==4.0.0",
         "idna==2.10",
         "requests>=2.22.0",
@@ -29,6 +28,6 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent"
     ],
-    python_requires='>=3.9'
+    python_requires='>3.9'
 )
 
